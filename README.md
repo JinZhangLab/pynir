@@ -4,7 +4,7 @@ This is a Python library for dealing with multivariate calibration, e.g., Near i
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install [pynir](https://pypi.org/project/pynir/)
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install [pynir](https://pypi.org/project/pynir/). In addition, we have also provide an online version at [link](https://nir.chemoinfolab.com)
 
 ```bash
 pip install pynir
