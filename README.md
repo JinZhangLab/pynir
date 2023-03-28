@@ -9,8 +9,11 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install [pynir]
 ```bash
 pip install pynir
 ```
+
 ## Usage
-### Simulata NIR spectra (spc) and reference values (conc) 
+
+### Simulata NIR spectra (spc) and reference values (conc)
+
 ```python
 from pynir.utils import simulateNIR
 
@@ -18,6 +21,7 @@ spc, conc = simulateNIR()
 ```
 
 ### Regression
+
 ```python
 from pynir.utils import simulateNIR
 from pynir.Calibration import pls
@@ -30,8 +34,8 @@ plsModel.fit(X,y)
 yhat = plsModel.predict(X)
 ```
 
-
 ### Classification
+
 ```python
 
 # simulate NIR data
@@ -51,6 +55,7 @@ yhat = plsdaModel.predict(X)
 ```
 
 ### Feature selection
+
 ```python
 # Feature selection
 from pynir.utils import simulateNIR
@@ -65,8 +70,8 @@ featureSelected_MC_UVE = mcModel.featureRank[:nSel]
 
 ```
 
-
 ### Outlier dection
+
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -83,9 +88,8 @@ Q, Tsq, Q_conf, Tsq_conf, idxOutlier = ODModel.fit(X, y).detect(X,y)
 ODModel.plot_HotellingT2_Q(Q, Tsq, Q_conf, Tsq_conf)
 ```
 
-
-
 ### Calibration Transfer
+
 ```python
 from pynir.utils import simulateNIR_calibrationTransfer
 from pynir.Calibration import pls, regresssionReport
@@ -137,8 +141,8 @@ plsModel1.plot_prediction(y[idxTest], yhat2_BS, title= "BS")
 
 ```
 
-
 ### Calibration Enhancement
+
 ```python
 from pynir.utils import simulateNIR_calibrationTransfer
 from pynir.Calibration import pls, regresssionReport
@@ -228,15 +232,17 @@ print("cost {:.2f} seconds for MT-PFCE".format(time.time()-tic))
 
 ```
 
-
-
 ## Demon
+
 First, execute
+
 ```bash
 git clone https://github.com/JinZhangLab/pynir.git
 cd ./pynir/tests
 ```
+
 Then, execute code in your python coding environment or just in terminal as follows:
+
 ```bash
 python Demo1_SimulateNIR.py
 python Demo2_Regression.py
@@ -253,15 +259,18 @@ python Demo12_calibrationTransfer_PFCE_Corn.py
 ```
 
 ## Ref
-- Zhang, J.;  Cui, X. Y.;  Cai, W. S.; Shao, X. G., A variable importance criterion for variable selection in near-infrared spectral analysis. Sci. China Chem. 2018, 62, 271-79.[link](https://link.springer.com/article/10.1007%2Fs11426-018-9368-9)
+
+- Zhang, J.; Cui, X. Y.; Cai, W. S.; Shao, X. G., A variable importance criterion for variable selection in near-infrared spectral analysis. Sci. China Chem. 2018, 62, 271-79.[link](https://link.springer.com/article/10.1007%2Fs11426-018-9368-9)
 
 - Zhang J., Li B. Y., Hu Y., Zhou L. X., Wang G. Z., Guo G., Zhang Q. H., Lei S. C., Zhang A. H. A parameter-free framework for calibration enhancement of near-infrared spectroscopy based on correlation constraint [J]. Analytica Chimica Acta, 2021, 1142: 169-178.
-[link](https://linkinghub.elsevier.com/retrieve/pii/S0003-2670(20)31110-7)
+  [link](<https://linkinghub.elsevier.com/retrieve/pii/S0003-2670(20)31110-7>)
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
 ## License
+
 [MIT](https://choosealicense.com/licenses/mit/)
