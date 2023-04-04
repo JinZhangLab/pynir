@@ -26,3 +26,4 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/JinZhangLab/pynir"
 "Bug Tracker" = "https://github.com/JinZhangLab/pynir/issues"
+"Documentation" = "https://pynir.readthedocs.io/en/latest/"
