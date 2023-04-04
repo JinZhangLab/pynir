@@ -5,9 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pynir"
 version = "0.7"
-authors = [
-  { name="Jin Zhang", email="jinzhang@nankai.edu.cn" },
-]
+authors = [{ name = "Jin Zhang", email = "jinzhang@nankai.edu.cn" }]
 description = "NIR calibration toolbox in python"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -20,9 +18,9 @@ dependencies = [
   "matplotlib>=3.6.0",
 ]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
 
 [project.urls]

@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pynir.utils &#8212; pynir  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for pynir.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Wed Sep 28 11:02:36 2022</span>
+
+<span class="sd">@author: Jin Zhang (zhangjin@mail.nankai.edu.cn)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+
+<div class="viewcode-block" id="simulateNIR"><a class="viewcode-back" href="../../pynir.html#pynir.utils.simulateNIR">[docs]</a><span class="k">def</span> <span class="nf">simulateNIR</span><span class="p">(</span><span class="n">nSample</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">n_components</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">refType</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">seeds</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    simulating NIR spectra</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nSample : int, optional</span>
+<span class="sd">        number of samples. The default is 100.</span>
+
+<span class="sd">    n_components : int, optional</span>
+<span class="sd">        number of componnet for spectral simulation. The default is 3.</span>
+
+<span class="sd">    refType : int, optional</span>
+<span class="sd">        type of reference value</span>
+<span class="sd">        None for no reference value output</span>
+<span class="sd">        1 for contious values as reference value output</span>
+<span class="sd">        2 or the larger integer for binary or class output.</span>
+
+<span class="sd">    seeds : int, optimal</span>
+<span class="sd">        random seed for generating spectra and reference values. The default is 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    X:  matrix, simulated NIR spectra matrix.</span>
+<span class="sd">    y: array, concentration or class of all samples.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">2500</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span> <span class="c1">#wavelength</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seeds</span><span class="p">)</span>
+    <span class="n">conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">nSample</span><span class="p">,</span><span class="n">n_components</span><span class="p">))</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span><span class="o">*</span><span class="mi">1500</span><span class="o">+</span><span class="mi">1000</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="o">+</span><span class="mi">100</span>
+    <span class="n">spcBase</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">wv</span><span class="p">,</span> <span class="n">mu</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_components</span><span class="p">)]</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">conc</span><span class="p">,</span><span class="n">spcBase</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">*</span><span class="n">noise</span>
+    <span class="n">conc</span> <span class="o">=</span> <span class="n">conc</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">conc</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">*</span><span class="n">noise</span>
+    <span class="k">if</span> <span class="n">refType</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">refType</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">refType</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">yquantile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">refType</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">refType</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">refType</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">conditioni</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">conditioni</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">conditioni</span><span class="o">*</span><span class="n">i</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;refType only allow integer larger than 0 as input&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">wv</span></div>
+
+
+<div class="viewcode-block" id="simulateNIR_calibrationTransfer"><a class="viewcode-back" href="../../pynir.html#pynir.utils.simulateNIR_calibrationTransfer">[docs]</a><span class="k">def</span> <span class="nf">simulateNIR_calibrationTransfer</span><span class="p">(</span><span class="n">nSample</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">n_components</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span><span class="n">shifts</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">refType</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">seeds</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    simulating NIR spectra for calibration transfer</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nSample : int, optional</span>
+<span class="sd">        number of samples. The default is 100.</span>
+
+<span class="sd">    n_components : int, optional</span>
+<span class="sd">        number of componnet for spectral simulation. The default is 3.</span>
+
+<span class="sd">    shifts: float, optimal</span>
+<span class="sd">        shift level of base peaks for simulte secondary NIR spectra data</span>
+
+<span class="sd">    refType : int, optional</span>
+<span class="sd">        type of reference value</span>
+<span class="sd">        None for no reference value output</span>
+<span class="sd">        1 for contious values as reference value output</span>
+<span class="sd">        2 or the larger integer for binary or class output.</span>
+
+<span class="sd">    seeds : int, optimal</span>
+<span class="sd">        random seed for generating spectra and reference values. The default is 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    X:  matrix, simulated NIR spectra matrix.</span>
+<span class="sd">    y: array, concentration or class of all samples.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">2500</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span> <span class="c1">#wavelength</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seeds</span><span class="p">)</span>
+    <span class="n">conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">nSample</span><span class="p">,</span><span class="n">n_components</span><span class="p">))</span>
+    <span class="n">mu1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span><span class="o">*</span><span class="mi">1500</span><span class="o">+</span><span class="mi">1000</span>
+    <span class="n">sigma1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="o">+</span><span class="mi">100</span>
+    <span class="n">spcBase1</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">wv</span><span class="p">,</span> <span class="n">mu1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">sigma1</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_components</span><span class="p">)]</span>
+    <span class="n">X1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">conc</span><span class="p">,</span><span class="n">spcBase1</span><span class="p">)</span>
+    <span class="n">X1</span> <span class="o">=</span> <span class="n">X1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">*</span><span class="n">noise</span>
+
+
+    <span class="n">mu2</span> <span class="o">=</span> <span class="n">mu1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">mu1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">*</span><span class="n">shifts</span>
+    <span class="n">sigma2</span> <span class="o">=</span> <span class="n">sigma1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">sigma1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">*</span><span class="n">shifts</span>
+    <span class="n">spcBase2</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">wv</span><span class="p">,</span> <span class="n">mu2</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">sigma2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_components</span><span class="p">)]</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">conc</span><span class="p">,</span><span class="n">spcBase2</span><span class="p">)</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">X2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">X2</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">*</span><span class="n">noise</span>
+
+
+    <span class="n">conc</span> <span class="o">=</span> <span class="n">conc</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">conc</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">*</span><span class="n">noise</span>
+    <span class="k">if</span> <span class="n">refType</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">refType</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">refType</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">yquantile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">refType</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">refType</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">refType</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">conditioni</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">conditioni</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">conc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">yquantile</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">conditioni</span><span class="o">*</span><span class="n">i</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;refType only allow integer larger than 0 as input&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">wv</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pynir</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Jin Zhang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
