@@ -241,7 +241,7 @@ First, execute
 
 ```bash
 git clone https://github.com/JinZhangLab/pynir.git
-cd ./pynir/tests
+cd ./pynir/examples
 ```
 
 Then, execute code in your python coding environment or just in terminal as follows:
