@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pynir"
-version = "0.7.2"
+version = "0.7.3"
 authors = [{ name = "Jin Zhang", email = "jinzhang@nankai.edu.cn" }]
 description = "NIR calibration toolbox in python"
 readme = "README.md"
