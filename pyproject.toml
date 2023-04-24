@@ -11,11 +11,11 @@ readme = "README.md"
 requires-python = ">=3.7"
 
 dependencies = [
-  "numpy>=1.13.3",
-  "scipy>=1.7.1",
-  "scikit-learn>=1.0.2",
-  "PyWavelets>=1.4.1",
-  "matplotlib>=3.6.0",
+  "numpy",
+  "scipy",
+  "scikit-learn",
+  "PyWavelets",
+  "matplotlib",
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
