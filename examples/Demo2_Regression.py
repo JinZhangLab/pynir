@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 from pynir.utils import simulateNIR
 from pynir.Calibration import pls
-from pynir.Calibration import regresssionReport
+from pynir.Calibration import regressionReport
 
 from sklearn.model_selection import train_test_split
 
@@ -41,9 +41,9 @@ r2cv = []
 r2p = []
 
 for i in range(n_components):
-    report_train = regresssionReport(ytrain, yhat_train[:,i])
-    report_cv = regresssionReport(ytrain, yhat_cv[:,i])
-    report_test = regresssionReport(ytest, yhat_test[:,i])
+    report_train = regressionReport(ytrain, yhat_train[:,i])
+    report_cv = regressionReport(ytrain, yhat_cv[:,i])
+    report_test = regressionReport(ytest, yhat_test[:,i])
 
     rmsec.append(report_train["rmse"])
     rmsecv.append(report_cv["rmse"])

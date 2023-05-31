@@ -1,5 +1,14 @@
+import os
+import sys
+
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+pynir_dir = os.path.join(parent_dir, 'src')
+if pynir_dir not in sys.path:
+    sys.path.insert(0, pynir_dir)
+
 from pynir.utils import simulateNIR_calibrationTransfer
-from pynir.Calibration import pls, regresssionReport
+from pynir.Calibration import pls, regressionReport
 from pynir.CalibrationTransfer import PDS,SST, BS
 import matplotlib.pyplot as plt
 import numpy as np

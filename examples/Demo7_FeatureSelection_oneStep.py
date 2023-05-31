@@ -1,8 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2019.4.30
-# @Author  : FrankEl
+# @Author  : Jin Zhang
 # @File    : Feature_selection_demo_mcuve.py
+import os
+import sys
+
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+pynir_dir = os.path.join(parent_dir, 'src')
+if pynir_dir not in sys.path:
+    sys.path.insert(0, pynir_dir)
 
 import matplotlib.pyplot as plt
 import numpy as np

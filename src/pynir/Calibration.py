@@ -104,7 +104,7 @@ class pls:
         rmsecv = []
         r2cv = []
         for i in range(yhat_cv.shape[1]):
-            reportcv = regresssionReport(self.y, yhat_cv[:, i])
+            reportcv = regressionReport(self.y, yhat_cv[:, i])
             rmsecv.append(reportcv["rmse"])
             r2cv.append(reportcv["r2"])
         optLV = int(np.argmin(rmsecv)+1)
@@ -131,7 +131,7 @@ class pls:
         return vipScore
 
     def plot_prediction(self, y, yhat, xlabel="Reference", ylabel="Prediction", title="", ax=None):
-        report = regresssionReport(y, yhat)
+        report = regressionReport(y, yhat)
         if ax == None:
             fig, ax = plt.subplots()
         ax.plot([np.min(y)*0.95, np.max(y)*1.05], [np.min(y)*0.95, np.max(y)*1.05],
@@ -401,7 +401,17 @@ def binaryClassificationReport(ytrue, ypred):
         return report
 
 
-def regresssionReport(ytrue, ypred):
+def regressionReport(ytrue, ypred):
+    '''
+    Computes the root mean squared error (RMSE) and R-squared (R2) for regression models.
+
+    Parameters:
+    ytrue (array-like): True values of the dependent variable.
+    ypred (array-like): Predicted values of the dependent variable.
+
+    Returns:
+    dict: A dictionary containing the RMSE and R2 values.
+    '''
     report = dict()
     report["rmse"] = mean_squared_error(ytrue, ypred, squared=False)
     report["r2"] = r2_score(ytrue, ypred)

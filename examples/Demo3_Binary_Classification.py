@@ -20,24 +20,24 @@ from sklearn.metrics import confusion_matrix
 
 
 # simulate NIR data
-X,y,wv = simulateNIR(nSample=200,nComp=10,refType=2, noise=1e-5)
+X,y,wv = simulateNIR(nSample=200,n_components=10,refType=2, noise=1e-5)
 
 Xtrain, Xtest, ytrain,ytest = train_test_split(X,y,test_size=0.2)
 
 # estabilish PLS model
-nComp = 10
-plsdaModel = plsda(n_components = nComp).fit(Xtrain,ytrain)
+n_components = 10
+plsdaModel = plsda(n_components = n_components).fit(Xtrain,ytrain)
 
 # 10 fold cross validation for selecting optimal nlv
 accuracy_cv = []
 yhat_cv  = plsdaModel.crossValidation_predict(nfold = 10)
-for i in range(nComp):
+for i in range(n_components):
     report_cv = binaryClassificationReport(ytrain, yhat_cv[:,i])
     accuracy_cv.append(report_cv["accuracy"])
 
 
 fig,ax = plt.subplots()
-ax.plot(np.arange(nComp)+1,accuracy_cv, marker = "*",label = "Accuracy$_c$$_v$")
+ax.plot(np.arange(n_components)+1,accuracy_cv, marker = "*",label = "Accuracy$_c$$_v$")
 ax.set_xlabel("nLV")
 ax.set_ylabel("Accuracy")
 ax.legend()

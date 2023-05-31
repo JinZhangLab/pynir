@@ -1,14 +1,14 @@
+import os
 import sys
-from pathlib import Path
 
-pynir_path = str(Path(__file__).parent.parent / 'src')
-
-if pynir_path not in sys.path:
-    sys.path.append(pynir_path)
-    print("add pynir path")
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+pynir_dir = os.path.join(parent_dir, 'src')
+if pynir_dir not in sys.path:
+    sys.path.insert(0, pynir_dir)
 
 from pynir.utils import simulateNIR_calibrationTransfer
-from pynir.Calibration import pls, regresssionReport
+from pynir.Calibration import pls, regressionReport
 from pynir.CalibrationTransfer import NS_PFCE,SS_PFCE,FS_PFCE,MT_PFCE
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,7 +20,7 @@ from sklearn.model_selection import train_test_split
 import time
 
 
-RawData = loadmat("./Data_Tablet.mat")
+RawData = loadmat(os.path.join(current_dir, "Data_Tablet.mat"))
 wv = RawData["wv"].ravel()
 Xcal1 = RawData["Xcal1"]
 Xcal2 = RawData["Xcal2"]

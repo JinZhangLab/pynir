@@ -1,14 +1,14 @@
+import os
 import sys
-from pathlib import Path
 
-pynir_path = str(Path(__file__).parent.parent / 'src')
-
-if pynir_path not in sys.path:
-    sys.path.append(pynir_path)
-    print("add pynir path")
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+pynir_dir = os.path.join(parent_dir, 'src')
+if pynir_dir not in sys.path:
+    sys.path.insert(0, pynir_dir)
 
 from pynir.utils import simulateNIR_calibrationTransfer
-from pynir.Calibration import pls, regresssionReport
+from pynir.Calibration import pls, regressionReport
 from pynir.CalibrationTransfer import NS_PFCE,SS_PFCE,FS_PFCE,MT_PFCE
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,7 +20,7 @@ from sklearn.model_selection import train_test_split
 import time
 
 
-RawData = loadmat("./Data_Corn.mat")
+RawData = loadmat(os.path.join(current_dir, "Data_Corn.mat"))
 wv = RawData["wv"].ravel()
 Xcal1 = RawData["Xcal1"]
 Xcal2 = RawData["Xcal2"]
@@ -50,12 +50,12 @@ fig.supxlabel("Wavelength (nm)")
 fig.supylabel("Intensity(A.U.)")
 plt.show()
 
-nComp = 4
-plsModel1 = pls(nComp=nComp).fit(Xcal1, ycal)
+n_components = 4
+plsModel1 = pls(n_components=n_components).fit(Xcal1, ycal)
 
-yhat1 = plsModel1.predict(Xtest1,nComp=nComp)
-yhat2= plsModel1.predict(Xtest2,nComp=nComp)
-yhat3= plsModel1.predict(Xtest3,nComp=nComp)
+yhat1 = plsModel1.predict(Xtest1,n_components=n_components)
+yhat2= plsModel1.predict(Xtest2,n_components=n_components)
+yhat3= plsModel1.predict(Xtest3,n_components=n_components)
 
 fig, ax = plt.subplots(3,sharex=True,figsize=(8,16))
 plsModel1.plot_prediction(ytest, yhat1,title = "First", ax = ax[0])
@@ -127,10 +127,10 @@ print("cost {:.2f} seconds for FS-PFCE".format(time.time()-tic))
 
 ## MT-PFCE
 tic = time.time()
-plsModel_global = pls(nComp=nComp).fit(np.vstack((Xcal1,Xtrans2,Xtrans3)),
+plsModel_global = pls(n_components=n_components).fit(np.vstack((Xcal1,Xtrans2,Xtrans3)),
                                        np.vstack((ycal,ytrans,ytrans)))
 optLV_global = plsModel_global.get_optLV()
-plsModel_global = pls(nComp=optLV_global).fit(np.vstack((Xcal1,Xtrans2,Xtrans3)),
+plsModel_global = pls(n_components=optLV_global).fit(np.vstack((Xcal1,Xtrans2,Xtrans3)),
                                        np.vstack((ycal,ytrans,ytrans)))
 
 bglb = plsModel_global.model['B'][:,-1]
