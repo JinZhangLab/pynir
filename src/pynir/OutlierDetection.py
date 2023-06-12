@@ -10,9 +10,37 @@ from scipy.stats import f, chi2
 
 import matplotlib.pyplot as plt
 
-class outlierDection_PLS():
-    # Ref1: https://nirpyresearch.com/outliers-detection-pls-regression-nir-spectroscopy-python/
-    # Ref2: https://www.sciencedirect.com/science/article/pii/S0378517314004980
+class outlierDetection_PLS():
+    """
+    A class for performing outlier detection using Partial Least Squares (PLS) regression.
+
+    Parameters
+    ----------
+    ncomp : int, optional
+        The number of components to use in the PLS regression (default is 2).
+    conf : float, optional
+        The confidence level for the outlier detection (default is 0.99).
+
+    Attributes
+    ----------
+    plsModel : PLSRegression object
+        The PLS regression model fitted to the input data.
+
+    Methods
+    -------
+    fit(X, y)
+        Fits the PLS regression model to the input data X and output data y.
+    detect(X, y)
+        Performs outlier detection on the input data X and output data y using the PLS model.
+    plot_HotellingT2_Q(Q, Tsq, Q_conf, Tsq_conf, ax=None)
+        Plots the Q-residuals against Hotelling's T-squared, with the confidence levels indicated by dashed lines.
+    
+    References
+    ----------
+    Ref1: https://nirpyresearch.com/outliers-detection-pls-regression-nir-spectroscopy-python/
+    Ref2: https://www.sciencedirect.com/science/article/pii/S0378517314004980
+    """
+
     def __init__(self, ncomp = 2, conf = 0.99):
         self.ncomp = ncomp
         self.conf = conf
