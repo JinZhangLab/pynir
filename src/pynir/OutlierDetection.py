@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 
 class outlierDetection_PLS():
     """
-    A class for performing outlier detection using Partial Least Squares (PLS) regression.
+    A class for performing outlier sample detection using Partial Least Squares (PLS)
+    regression.
 
     Parameters
     ----------
@@ -31,13 +32,16 @@ class outlierDetection_PLS():
     fit(X, y)
         Fits the PLS regression model to the input data X and output data y.
     detect(X, y)
-        Performs outlier detection on the input data X and output data y using the PLS model.
+        Performs outlier detection on the input data X and output data y using
+        the PLS model.
     plot_HotellingT2_Q(Q, Tsq, Q_conf, Tsq_conf, ax=None)
-        Plots the Q-residuals against Hotelling's T-squared, with the confidence levels indicated by dashed lines.
+        Plots the Q-residuals against Hotelling's T-squared, with the confidence
+        levels indicated by dashed lines.
     
     References
     ----------
-    Ref1: https://nirpyresearch.com/outliers-detection-pls-regression-nir-spectroscopy-python/
+    Ref1:
+    https://nirpyresearch.com/outliers-detection-pls-regression-nir-spectroscopy-python/
     Ref2: https://www.sciencedirect.com/science/article/pii/S0378517314004980
     """
 
@@ -46,6 +50,21 @@ class outlierDetection_PLS():
         self.conf = conf
     
     def fit(self, X, y):
+        """
+        Fits the PLS regression model to the input data X and output data y.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The input matrix of data.
+        y : numpy.ndarray
+            The output vector of data.
+
+        Returns
+        -------
+        self : outlierDetection_PLS
+            The fitted outlier detection object.
+        """
         ncomp = self.ncomp
         self.plsModel = PLSRegression(n_components=ncomp)
         self.plsModel.fit(X, y)
@@ -53,25 +72,44 @@ class outlierDetection_PLS():
         return self
     
     def detect(self, X, y):
+        """
+        Performs outlier detection on the input data X and output data y using
+        the PLS model.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The input matrix of data.
+        y : numpy.ndarray
+            The output vector of data.
+
+        Returns
+        -------
+        Q : numpy.ndarray
+            The Q-residuals.
+        Tsq : numpy.ndarray
+            Hotelling's T-squared.
+        Q_conf : float
+            The confidence level for the Q-residuals.
+        Tsq_conf : float
+            The confidence level for Hotelling's T-squared.
+        idxOutlier : numpy.ndarray
+            A boolean array indicating which samples are outliers.
+        """
         ncomp = self.ncomp
         conf = self.conf
         plsModel = self.plsModel
-        # Get X scores
+
         T = plsModel.transform(X)
 
-        # Calculate error array
         Err = X - plsModel.inverse_transform(T)
          
-        # Calculate Q-residuals (sum over the rows of the error array)
         Q = np.sum(Err**2, axis=1)
         
-        # Estimate the confidence level for the Q-residuals
         Q_conf = (np.var(Q)/2/np.mean(Q))*chi2.ppf(conf, 2*np.mean(Q)**2/np.var(Q))
         
-        # Calculate Hotelling's T-squared (note that data are normalised by default)
         Tsq = np.sum((plsModel.x_scores_/np.std(plsModel.x_scores_, axis=0))**2, axis=1)
         
-        # Calculate confidence level for T-squared from the ppf of the F distribution
         Tsq_conf = f.ppf(q=conf,dfn=ncomp,dfd=X.shape[0]-ncomp)
         Tsq_conf = Tsq_conf*ncomp*(X.shape[0]-1)*(X.shape[0]+1)/X.shape[0]/(X.shape[0]-ncomp)
         idxOutlier = np.logical_and(Q>Q_conf, Tsq>Tsq_conf)
@@ -79,7 +117,29 @@ class outlierDetection_PLS():
         return Q, Tsq, Q_conf, Tsq_conf, idxOutlier
     
     def plot_HotellingT2_Q(self, Q, Tsq, Q_conf, Tsq_conf, ax=None):
-        if ax ==None:
+        """
+        Plots the Q-residuals against Hotelling's T-squared, with the confidence
+        levels indicated by dashed lines.
+
+        Parameters
+        ----------
+        Q : numpy.ndarray
+            The Q-residuals.
+        Tsq : numpy.ndarray
+            Hotelling's T-squared.
+        Q_conf : float
+            The confidence level for the Q-residuals.
+        Tsq_conf : float
+            The confidence level for Hotelling's T-squared.
+        ax : matplotlib.axes.Axes, optional
+            The axes on which to plot the figure (default is None).
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+            The axes object containing the plotted figure.
+        """
+        if ax == None:
             fig, ax = plt.subplots(figsize=(8,4.5))
     
         ax.plot(Tsq, Q, 'o')
@@ -88,5 +148,5 @@ class outlierDetection_PLS():
         ax.plot([plt.axis()[0],plt.axis()[1]],[Q_conf,Q_conf],  '--')
         ax.set_xlabel("Hotelling's T-squared")
         ax.set_ylabel('Q residuals')
-     
-        plt.show()
+    
+        return ax

@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pynir.Calibration &#8212; pynir  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for pynir.Calibration</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Wed Sep 28 11:00:35 2022</span>
+
+<span class="sd">@author: chinn</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">KFold</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">r2_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_decomposition</span> <span class="kn">import</span> <span class="n">PLSRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.discriminant_analysis</span> <span class="kn">import</span> <span class="n">LinearDiscriminantAnalysis</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span><span class="p">,</span> <span class="n">cross_val_predict</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<div class="viewcode-block" id="pls"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls">[docs]</a><span class="k">class</span> <span class="nc">pls</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Partial Least Squares (PLS) regression model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_components : int, optional (default=2)</span>
+<span class="sd">        The number of PLS components to use.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : dict</span>
+<span class="sd">        The PLS model, containing the following keys:</span>
+<span class="sd">        - &#39;x_scores&#39;: the X scores</span>
+<span class="sd">        - &#39;x_loadings&#39;: the X loadings</span>
+<span class="sd">        - &#39;y_loadings&#39;: the Y loadings</span>
+<span class="sd">        - &#39;x_weights&#39;: the X weights</span>
+<span class="sd">        - &#39;B&#39;: the regression coefficients</span>
+
+<span class="sd">    optLV : int</span>
+<span class="sd">        The optimal number of PLS components, determined by cross-validation.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    fit(X, y)</span>
+<span class="sd">        Fit the PLS model to the training data.</span>
+
+<span class="sd">    predict(Xnew, n_components=None)</span>
+<span class="sd">        Predict the response variable for new data.</span>
+
+<span class="sd">    crossValidation_predict(nfold=10)</span>
+<span class="sd">        Perform cross-validation and return the predicted response variable.</span>
+
+<span class="sd">    get_optLV(nfold=10)</span>
+<span class="sd">        Determine the optimal number of PLS components using cross-validation.</span>
+
+<span class="sd">    transform(Xnew)</span>
+<span class="sd">        Transform new data into the PLS space.</span>
+
+<span class="sd">    get_vip()</span>
+<span class="sd">        Compute the variable importance in projection (VIP) scores.</span>
+
+<span class="sd">    plot_prediction(y, yhat, xlabel=&quot;Reference&quot;, ylabel=&quot;Prediction&quot;, title=&quot;&quot;, ax=None)</span>
+<span class="sd">        Plot the predicted response variable against the reference variable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
+
+<div class="viewcode-block" id="pls.fit"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the PLS model to the training data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The independent variable matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The dependent variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : pls</span>
+<span class="sd">            The fitted PLS model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="n">meanX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">meany</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">Xcentered</span> <span class="o">=</span> <span class="n">X</span> <span class="o">-</span> <span class="n">meanX</span>
+        <span class="n">ycentered</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">meany</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">simpls</span><span class="p">(</span><span class="n">Xcentered</span><span class="p">,</span> <span class="n">ycentered</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span>
+        <span class="n">meanX_hat</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">meanX</span><span class="p">,</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">meany</span>
+        <span class="n">model</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">meanX_hat</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="pls.predict"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Xnew</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict the response variable for new data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Xnew : numpy.ndarray</span>
+<span class="sd">            The new independent variable matrix.</span>
+<span class="sd">        n_components : int, optional</span>
+<span class="sd">            The number of PLS components to use (default is None, which uses all components).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ynew_hat : numpy.ndarray</span>
+<span class="sd">            The predicted response variable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">n_components</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][:,</span> <span class="n">n_components</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">Xnew</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;The feature number of predictor is isconsistent with that of indepnentent.&#39;</span><span class="p">)</span>
+        <span class="n">Xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">Xnew</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">Xnew</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ynew_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xnew</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ynew_hat</span></div>
+
+<div class="viewcode-block" id="pls.crossValidation_predict"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls.crossValidation_predict">[docs]</a>    <span class="k">def</span> <span class="nf">crossValidation_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nfold</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform cross-validation and return the predicted response variable.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nfold : int, optional (default=10)</span>
+<span class="sd">            The number of folds to use in cross-validation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        yhat : numpy.ndarray</span>
+<span class="sd">            The predicted response variable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">))</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">pls</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">nfold</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">train</span><span class="p">])</span>
+            <span class="n">yhat</span><span class="p">[</span><span class="n">test</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">[</span><span class="n">test</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">yhat</span></div>
+
+<div class="viewcode-block" id="pls.get_optLV"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls.get_optLV">[docs]</a>    <span class="k">def</span> <span class="nf">get_optLV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nfold</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine the optimal number of PLS components using cross-validation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nfold : int, optional (default=10)</span>
+<span class="sd">            The number of folds to use in cross-validation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        optLV : int</span>
+<span class="sd">            The optimal number of PLS components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yhat_cv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossValidation_predict</span><span class="p">(</span><span class="n">nfold</span><span class="p">)</span>
+        <span class="n">rmsecv</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">r2cv</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">yhat_cv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">reportcv</span> <span class="o">=</span> <span class="n">regressionReport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat_cv</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+            <span class="n">rmsecv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reportcv</span><span class="p">[</span><span class="s2">&quot;rmse&quot;</span><span class="p">])</span>
+            <span class="n">r2cv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reportcv</span><span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">])</span>
+        <span class="n">optLV</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">rmsecv</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optLV</span> <span class="o">=</span> <span class="n">optLV</span>
+        <span class="k">return</span> <span class="n">optLV</span></div>
+
+<div class="viewcode-block" id="pls.transform"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Xnew</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform new data into the PLS space.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Xnew : numpy.ndarray</span>
+<span class="sd">            The new independent variable matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tnew : numpy.ndarray</span>
+<span class="sd">            The transformed data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">meanX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Xnew_c</span> <span class="o">=</span> <span class="n">Xnew</span> <span class="o">-</span> <span class="n">meanX</span>
+        <span class="n">Tnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xnew_c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;x_weights&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Tnew</span></div>
+
+<div class="viewcode-block" id="pls.get_vip"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls.get_vip">[docs]</a>    <span class="k">def</span> <span class="nf">get_vip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the variable importance in projection (VIP) scores.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vipScore : numpy.ndarray</span>
+<span class="sd">            The VIP scores.</span>
+<span class="sd">        </span>
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        https://www.sciencedirect.com/topics/engineering/variable-importance-in-projection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_scores</span><span class="p">,</span> <span class="n">x_loadings</span><span class="p">,</span> <span class="n">y_loadings</span><span class="p">,</span> <span class="n">x_weights</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;x_scores&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;x_loadings&#39;</span><span class="p">],</span>\
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;y_loadings&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;x_weights&#39;</span><span class="p">]</span>
+
+        <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_components</span> <span class="o">=</span> <span class="n">x_scores</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">W0</span> <span class="o">=</span> <span class="n">x_weights</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x_weights</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">x_loadings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sumSq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x_scores</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_loadings</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">vipScore</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sumSq</span> <span class="o">*</span> <span class="p">(</span><span class="n">W0</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sumSq</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">vipScore</span></div>
+
+<div class="viewcode-block" id="pls.plot_prediction"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.pls.plot_prediction">[docs]</a>    <span class="k">def</span> <span class="nf">plot_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Reference&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Prediction&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the predicted response variable against the reference variable.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The reference variable.</span>
+<span class="sd">        yhat : numpy.ndarray</span>
+<span class="sd">            The predicted response variable.</span>
+<span class="sd">        xlabel : str, optional (default=&quot;Reference&quot;)</span>
+<span class="sd">            The label for the x-axis.</span>
+<span class="sd">        ylabel : str, optional (default=&quot;Prediction&quot;)</span>
+<span class="sd">            The label for the y-axis.</span>
+<span class="sd">        title : str, optional (default=&quot;&quot;)</span>
+<span class="sd">            The title for the plot.</span>
+<span class="sd">        ax : matplotlib.axes.Axes, optional</span>
+<span class="sd">            The axes on which to plot the figure (default is None).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : matplotlib.axes.Axes</span>
+<span class="sd">            The axes object containing the plotted figure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="n">regressionReport</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mf">1.05</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mf">1.05</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;y=x&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:green&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prediction&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span>
+                <span class="s2">&quot;RMSEP = </span><span class="si">{:.4f}</span><span class="se">\n</span><span class="s2">R$^2$ = </span><span class="si">{:.2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">report</span><span class="p">[</span><span class="s2">&quot;rmse&quot;</span><span class="p">],</span> <span class="n">report</span><span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">]),</span>
+                <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="plsda"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda">[docs]</a><span class="k">class</span> <span class="nc">plsda</span><span class="p">(</span><span class="n">PLSRegression</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Partial Least Squares Discriminant Analysis (PLS-DA) model.</span>
+
+<span class="sd">    This class extends the scikit-learn PLSRegression class to include</span>
+<span class="sd">    Linear Discriminant Analysis (LDA) for classification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_components : int, optional (default = 2)</span>
+<span class="sd">        Number of components to keep in the model.</span>
+<span class="sd">    scale : bool, optional (default = True)</span>
+<span class="sd">        Whether to scale the data before fitting the model.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments to pass to the PLSRegression constructor.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lda : LinearDiscriminantAnalysis</span>
+<span class="sd">        The LDA model used for classification.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    fit(X, y)</span>
+<span class="sd">        Fit the PLS-DA model to the training data.</span>
+<span class="sd">    predict(X)</span>
+<span class="sd">        Predict the class labels for new data.</span>
+<span class="sd">    predict_log_proba(X)</span>
+<span class="sd">        Predict the log probabilities of the class labels for new data.</span>
+<span class="sd">    predict_proba(X)</span>
+<span class="sd">        Predict the probabilities of the class labels for new data.</span>
+<span class="sd">    crossValidation_predict(nfold=10)</span>
+<span class="sd">        Perform cross-validation to predict the class labels for the training data.</span>
+<span class="sd">    get_optLV(nfold=10)</span>
+<span class="sd">        Find the optimal number of components using cross-validation.</span>
+<span class="sd">    get_confusion_matrix(X, y)</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+<span class="sd">    get_vip()</span>
+<span class="sd">        Compute the Variable Importance in Projection (VIP) scores for the model.</span>
+<span class="sd">    permutation_test(X, y, n_repeats=100, n_jobs=None)</span>
+<span class="sd">        Perform a permutation test to assess the significance of the model.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lda</span> <span class="o">=</span> <span class="n">LinearDiscriminantAnalysis</span><span class="p">()</span>
+
+<div class="viewcode-block" id="plsda.fit"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the PLS-DA model to the training data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The training data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : plsda</span>
+<span class="sd">            The fitted PLS-DA model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_scores_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="plsda.predict"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict the class labels for new data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The new data matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y_pred : numpy.ndarray</span>
+<span class="sd">            The predicted class labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="plsda.predict_log_proba"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.predict_log_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_log_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict the log probabilities of the class labels for new data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The new data matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        log_proba : numpy.ndarray</span>
+<span class="sd">            The log probabilities of the class labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">predict_log_proba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="plsda.predict_proba"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict the probabilities of the class labels for new data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The new data matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        proba : numpy.ndarray</span>
+<span class="sd">            The probabilities of the class labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="plsda.crossValidation_predict"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.crossValidation_predict">[docs]</a>    <span class="k">def</span> <span class="nf">crossValidation_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nfold</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform cross-validation to predict the class labels for the training data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nfold : int, optional (default = 10)</span>
+<span class="sd">            The number of folds to use in cross-validation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        yhat : numpy.ndarray</span>
+<span class="sd">            The predicted class labels for each fold and each number of components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">plsda</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">nfold</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">train</span><span class="p">,</span> <span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="n">train</span><span class="p">])</span>
+                <span class="n">yhat</span><span class="p">[</span><span class="n">test</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">test</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">return</span> <span class="n">yhat</span></div>
+
+<div class="viewcode-block" id="plsda.get_optLV"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.get_optLV">[docs]</a>    <span class="k">def</span> <span class="nf">get_optLV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nfold</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the optimal number of components using cross-validation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nfold : int, optional (default = 10)</span>
+<span class="sd">            The number of folds to use in cross-validation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        optLV : int</span>
+<span class="sd">            The optimal number of components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yhat_cv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossValidation_predict</span><span class="p">(</span><span class="n">nfold</span><span class="p">)</span>
+        <span class="n">accuracy_cv</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">yhat_cv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">report_cv</span> <span class="o">=</span> <span class="n">binaryClassificationReport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat_cv</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+                <span class="n">accuracy_cv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">report_cv</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">report_cv</span> <span class="o">=</span> <span class="n">multiClassificationReport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat_cv</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+                <span class="n">accuracy_tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">rep</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">rep</span> <span class="ow">in</span> <span class="n">report_cv</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+                <span class="n">accuracy_cv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">accuracy_tmp</span><span class="p">))</span>
+
+        <span class="n">optLV</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">accuracy_cv</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optLV</span> <span class="o">=</span> <span class="n">optLV</span>
+        <span class="k">return</span> <span class="n">optLV</span></div>
+
+<div class="viewcode-block" id="plsda.get_confusion_matrix"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.get_confusion_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_confusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cm : numpy.ndarray</span>
+<span class="sd">            The confusion matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cm</span></div>
+
+<div class="viewcode-block" id="plsda.get_vip"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.get_vip">[docs]</a>    <span class="k">def</span> <span class="nf">get_vip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the Variable Importance in Projection (VIP) scores for the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vipScore : numpy.ndarray</span>
+<span class="sd">            The VIP scores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># latex code: VIP = \sqrt{\frac{p\sum_{a=1}^{A}((q_a^2t_a^Tt_a)(w_{ja}/||w_a||)^2}{\sum_{a=1}^A{(q_a^2t_a^Tt_a)}}}</span>
+        <span class="n">XL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_scores_</span>
+        <span class="n">yl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_scores_</span>
+        <span class="n">Xw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_weights_</span>
+
+        <span class="n">W0</span> <span class="o">=</span> <span class="n">Xw</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Xw</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">XL</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sumSq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Xw</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">yl</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">vipScore</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sumSq</span> <span class="o">*</span> <span class="p">(</span><span class="n">W0</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sumSq</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">vipScore</span></div>
+
+<div class="viewcode-block" id="plsda.permutation_test"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plsda.permutation_test">[docs]</a>    <span class="k">def</span> <span class="nf">permutation_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_repeats</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a permutation test to assess the significance of the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+<span class="sd">        n_repeats : int, optional (default = 100)</span>
+<span class="sd">            The number of permutations to perform.</span>
+<span class="sd">        n_jobs : int, optional (default = None)</span>
+<span class="sd">            The number of parallel jobs to run. If None, all CPUs are used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        q2 : numpy.ndarray</span>
+<span class="sd">            The Q2 values for each permutation.</span>
+<span class="sd">        r2 : numpy.ndarray</span>
+<span class="sd">            The R2 values for each permutation.</span>
+<span class="sd">        permutation_ratio : numpy.ndarray</span>
+<span class="sd">            The ratio of permuted target variable values to total target variable values for each permutation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">q2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">)</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">)</span>
+        <span class="n">permutation_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+            <span class="n">y_shuffled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_shuffled</span><span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">cross_val_predict</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_shuffled</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+            <span class="n">q2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_shuffled</span><span class="p">)</span>
+            <span class="n">r2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_shuffled</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+            <span class="n">permutation_ratio</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_shuffled</span> <span class="o">!=</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">q2</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">permutation_ratio</span></div></div>
+
+
+<div class="viewcode-block" id="lsvc"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.lsvc">[docs]</a><span class="k">class</span> <span class="nc">lsvc</span><span class="p">(</span><span class="n">LinearSVC</span><span class="p">):</span>  <span class="c1"># linear svc</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Linear Support Vector Classification (Linear SVC) model.</span>
+
+<span class="sd">    This class extends the scikit-learn LinearSVC class to include</span>
+<span class="sd">    methods for finding the optimal hyperparameters and computing</span>
+<span class="sd">    the confusion matrix.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_optParams(X, y, Params=None, nfold=10, n_jobs=None)</span>
+<span class="sd">        Find the optimal hyperparameters for the model using cross-validation.</span>
+<span class="sd">    get_confusion_matrix(X, y)</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="lsvc.get_optParams"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.lsvc.get_optParams">[docs]</a>    <span class="k">def</span> <span class="nf">get_optParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nfold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the optimal hyperparameters for the model using cross-validation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+<span class="sd">        Params : dict, optional (default = None)</span>
+<span class="sd">            The hyperparameters to search over. If None, a default set of hyperparameters is used.</span>
+<span class="sd">        nfold : int, optional (default = 10)</span>
+<span class="sd">            The number of folds to use in cross-validation.</span>
+<span class="sd">        n_jobs : int, optional (default = None)</span>
+<span class="sd">            The number of parallel jobs to run. If None, all CPUs are used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        best_params : dict</span>
+<span class="sd">            The optimal hyperparameters for the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                      <span class="s1">&#39;penalty&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;l1&#39;</span><span class="p">,</span> <span class="s1">&#39;l2&#39;</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>  <span class="n">param_grid</span><span class="o">=</span><span class="n">Params</span><span class="p">,</span>
+                                <span class="n">cv</span><span class="o">=</span><span class="n">nfold</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span><span class="o">.</span><span class="n">best_params_</span></div>
+
+<div class="viewcode-block" id="lsvc.get_confusion_matrix"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.lsvc.get_confusion_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_confusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cm : numpy.ndarray</span>
+<span class="sd">            The confusion matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cm</span></div></div>
+
+
+<div class="viewcode-block" id="svc"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.svc">[docs]</a><span class="k">class</span> <span class="nc">svc</span><span class="p">(</span><span class="n">SVC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Support Vector Classification (SVC) model.</span>
+
+<span class="sd">    This class extends the scikit-learn SVC class to include methods for</span>
+<span class="sd">    finding the optimal hyperparameters and computing the confusion matrix.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_optParams(X, y, Params=None, nfold=10, n_jobs=None)</span>
+<span class="sd">        Find the optimal hyperparameters for the model using cross-validation.</span>
+<span class="sd">    get_confusion_matrix(X, y)</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="svc.get_optParams"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.svc.get_optParams">[docs]</a>    <span class="k">def</span> <span class="nf">get_optParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nfold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the optimal hyperparameters for the model using cross-validation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+<span class="sd">        Params : dict, optional (default = None)</span>
+<span class="sd">            The hyperparameters to search over. If None, a default set of hyperparameters is used.</span>
+<span class="sd">        nfold : int, optional (default = 10)</span>
+<span class="sd">            The number of folds to use in cross-validation.</span>
+<span class="sd">        n_jobs : int, optional (default = None)</span>
+<span class="sd">            The number of parallel jobs to run. If None, all CPUs are used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        best_params : dict</span>
+<span class="sd">            The optimal hyperparameters for the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                      <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                      <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;poly&#39;</span><span class="p">,</span> <span class="s1">&#39;rbf&#39;</span><span class="p">,</span> <span class="s1">&#39;sigmoid&#39;</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>  <span class="n">param_grid</span><span class="o">=</span><span class="n">Params</span><span class="p">,</span>
+                                <span class="n">cv</span><span class="o">=</span><span class="n">nfold</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span><span class="o">.</span><span class="n">best_params_</span></div>
+
+<div class="viewcode-block" id="svc.get_confusion_matrix"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.svc.get_confusion_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_confusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cm : numpy.ndarray</span>
+<span class="sd">            The confusion matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cm</span></div></div>
+
+
+<div class="viewcode-block" id="rf"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.rf">[docs]</a><span class="k">class</span> <span class="nc">rf</span><span class="p">(</span><span class="n">RandomForestClassifier</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Random Forest Classification (RF) model.</span>
+
+<span class="sd">    This class extends the scikit-learn RandomForestClassifier class to include</span>
+<span class="sd">    methods for finding the optimal hyperparameters and computing the confusion matrix.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_optParams(X, y, Params=None, nfold=10, n_jobs=None)</span>
+<span class="sd">        Find the optimal hyperparameters for the model using cross-validation.</span>
+<span class="sd">    get_confusion_matrix(X, y)</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="rf.get_optParams"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.rf.get_optParams">[docs]</a>    <span class="k">def</span> <span class="nf">get_optParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nfold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the optimal hyperparameters for the model using cross-validation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+<span class="sd">        Params : dict, optional (default = None)</span>
+<span class="sd">            The hyperparameters to search over. If None, a default set of hyperparameters is used.</span>
+<span class="sd">        nfold : int, optional (default = 10)</span>
+<span class="sd">            The number of folds to use in cross-validation.</span>
+<span class="sd">        n_jobs : int, optional (default = None)</span>
+<span class="sd">            The number of parallel jobs to run. If None, all CPUs are used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        best_params : dict</span>
+<span class="sd">            The optimal hyperparameters for the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                      <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>  <span class="n">param_grid</span><span class="o">=</span><span class="n">Params</span><span class="p">,</span>
+                                <span class="n">cv</span><span class="o">=</span><span class="n">nfold</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gsh</span><span class="o">.</span><span class="n">best_params_</span></div>
+
+<div class="viewcode-block" id="rf.get_confusion_matrix"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.rf.get_confusion_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_confusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the confusion matrix for the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The data matrix.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cm : numpy.ndarray</span>
+<span class="sd">            The confusion matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cm</span></div></div>
+
+
+<div class="viewcode-block" id="multiClass_to_binaryMatrix"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.multiClass_to_binaryMatrix">[docs]</a><span class="k">class</span> <span class="nc">multiClass_to_binaryMatrix</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Multi-class to binary matrix conversion.</span>
+
+<span class="sd">    This class is used to convert a multi-class target variable into a binary matrix</span>
+<span class="sd">    suitable for training a multi-label classifier.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    fit(x)</span>
+<span class="sd">        Fit the transformer to the data.</span>
+<span class="sd">    transform(x)</span>
+<span class="sd">        Transform the data into a binary matrix.</span>
+<span class="sd">    reTransform(xnew)</span>
+<span class="sd">        Convert the binary matrix back into the original target variable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="multiClass_to_binaryMatrix.fit"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.multiClass_to_binaryMatrix.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the transformer to the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : object</span>
+<span class="sd">            Returns self.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="multiClass_to_binaryMatrix.transform"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.multiClass_to_binaryMatrix.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform the data into a binary matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : numpy.ndarray</span>
+<span class="sd">            The target variable vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Xnew : numpy.ndarray</span>
+<span class="sd">            The binary matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">classi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">):</span>
+                <span class="n">Xnew</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="o">==</span> <span class="n">classi</span>
+        <span class="k">return</span> <span class="n">Xnew</span></div>
+
+<div class="viewcode-block" id="multiClass_to_binaryMatrix.reTransform"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.multiClass_to_binaryMatrix.reTransform">[docs]</a>    <span class="k">def</span> <span class="nf">reTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xnew</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the binary matrix back into the original target variable.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xnew : numpy.ndarray</span>
+<span class="sd">            The binary matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        x : numpy.ndarray</span>
+<span class="sd">            The original target variable vector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">xnew</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xnew</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="n">x</span></div></div>
+
+
+<div class="viewcode-block" id="plot_confusion_matrix"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.plot_confusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span>
+                          <span class="n">target_names</span><span class="p">,</span>
+                          <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion matrix&#39;</span><span class="p">,</span>
+                          <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    given a sklearn confusion matrix (cm), make a nice plot</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    cm:           confusion matrix from sklearn.metrics.confusion_matrix</span>
+
+<span class="sd">    target_names: given classification classes such as [0, 1, 2]</span>
+<span class="sd">                  the class names, for example: [&#39;high&#39;, &#39;medium&#39;, &#39;low&#39;]</span>
+
+<span class="sd">    title:        the text to display at the top of the matrix</span>
+
+<span class="sd">    cmap:         the gradient of the values displayed from matplotlib.pyplot.cm</span>
+<span class="sd">                  see http://matplotlib.org/examples/color/colormaps_reference.html</span>
+<span class="sd">                  plt.get_cmap(&#39;jet&#39;) or plt.cm.Blues</span>
+
+<span class="sd">    normalize:    If False, plot the raw numbers</span>
+<span class="sd">                  If True, plot the proportions</span>
+
+<span class="sd">    Usage</span>
+<span class="sd">    -----</span>
+<span class="sd">    plot_confusion_matrix(cm           = cm,                  # confusion matrix created by</span>
+<span class="sd">                                                              # sklearn.metrics.confusion_matrix</span>
+<span class="sd">                          normalize    = True,                # show proportions</span>
+<span class="sd">                          target_names = y_labels_vals,       # list of names of the classes</span>
+<span class="sd">                          title        = best_estimator_name) # title of graph</span>
+
+<span class="sd">    Citiation</span>
+<span class="sd">    ---------</span>
+<span class="sd">    http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">accuracy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+    <span class="n">misclass</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">accuracy</span>
+
+    <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">target_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tick_marks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_names</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">tick_marks</span><span class="p">,</span> <span class="n">target_names</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">tick_marks</span><span class="p">,</span> <span class="n">target_names</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+    <span class="n">thresh</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="mf">1.5</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="n">cm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:0.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]),</span>
+                         <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span> <span class="k">if</span> <span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thresh</span> <span class="k">else</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:,}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]),</span>
+                         <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span> <span class="k">if</span> <span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thresh</span> <span class="k">else</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;True label&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted label</span><span class="se">\n</span><span class="s1">accuracy=</span><span class="si">{:0.4f}</span><span class="s1">; misclass=</span><span class="si">{:0.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">accuracy</span><span class="p">,</span> <span class="n">misclass</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="multiClassificationReport"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.multiClassificationReport">[docs]</a><span class="k">def</span> <span class="nf">multiClassificationReport</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a classification report for a multi-class classification problem.</span>
+
+<span class="sd">    This function generates a classification report for a multi-class classification problem</span>
+<span class="sd">    by computing binary classification reports for each class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ytrue : numpy.ndarray</span>
+<span class="sd">        The true target variable vector.</span>
+<span class="sd">    ypred : numpy.ndarray</span>
+<span class="sd">        The predicted target variable vector.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    report : dict</span>
+<span class="sd">        A dictionary containing binary classification reports for each class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ytrue</span><span class="p">)</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">labeli</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+        <span class="n">report</span><span class="p">[</span><span class="n">labeli</span><span class="p">]</span> <span class="o">=</span> <span class="n">binaryClassificationReport</span><span class="p">(</span>
+            <span class="n">ytrue</span><span class="o">=</span><span class="n">ytrue</span> <span class="o">==</span> <span class="n">labeli</span><span class="p">,</span> <span class="n">ypred</span><span class="o">=</span><span class="n">ypred</span> <span class="o">==</span> <span class="n">labeli</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">report</span></div>
+
+
+<div class="viewcode-block" id="binaryClassificationReport"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.binaryClassificationReport">[docs]</a><span class="k">def</span> <span class="nf">binaryClassificationReport</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a binary classification report.</span>
+
+<span class="sd">    This function generates a binary classification report for a binary classification problem</span>
+<span class="sd">    by computing the confusion matrix and various performance metrics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ytrue : numpy.ndarray</span>
+<span class="sd">        The true target variable vector.</span>
+<span class="sd">    ypred : numpy.ndarray</span>
+<span class="sd">        The predicted target variable vector.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    report : dict</span>
+<span class="sd">        A dictionary containing various performance metrics.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ytrue</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="p">(</span><span class="s2">&quot;Use the multiClassificationReport function for multiple classification.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tn</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">tp</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">)</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;sensitivity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recall_score</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">)</span>  <span class="c1"># recall</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;specificity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tn</span><span class="o">/</span><span class="p">(</span><span class="n">tn</span><span class="o">+</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">report</span><span class="p">[</span><span class="s2">&quot;f1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">report</span></div>
+
+
+<div class="viewcode-block" id="regressionReport"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.regressionReport">[docs]</a><span class="k">def</span> <span class="nf">regressionReport</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a regression report.</span>
+
+<span class="sd">    This function generates a regression report for a regression problem</span>
+<span class="sd">    by computing the root mean squared error (RMSE) and the R-squared (R2) score.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ytrue : numpy.ndarray</span>
+<span class="sd">        The true target variable vector.</span>
+<span class="sd">    ypred : numpy.ndarray</span>
+<span class="sd">        The predicted target variable vector.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    report : dict</span>
+<span class="sd">        A dictionary containing the RMSE and R2 score.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">report</span><span class="p">[</span><span class="s2">&quot;rmse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">report</span><span class="p">[</span><span class="s2">&quot;r2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">ytrue</span><span class="p">,</span> <span class="n">ypred</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">report</span></div>
+
+
+<div class="viewcode-block" id="simpls"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.simpls">[docs]</a><span class="k">def</span> <span class="nf">simpls</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_components</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform SIMPLS (Partial Least Squares) regression.</span>
+
+<span class="sd">    This function performs SIMPLS regression, which is a variant of PLS regression</span>
+<span class="sd">    that uses a sequential algorithm to compute the PLS components.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : numpy.ndarray</span>
+<span class="sd">        The independent variable matrix.</span>
+<span class="sd">    y : numpy.ndarray</span>
+<span class="sd">        The dependent variable vector.</span>
+<span class="sd">    n_components : int</span>
+<span class="sd">        The number of PLS components to compute.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    results : dict</span>
+<span class="sd">        A dictionary containing the PLS components and loadings.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This implementation is based on the algorithm described in:</span>
+<span class="sd">    Wold, S., Ruhe, A., Wold, H., &amp; Dunn III, W. J. (1984).</span>
+<span class="sd">    The collinearity problem in linear regression. The partial least squares (PLS) approach to generalized inverses.</span>
+<span class="sd">    SIAM Journal on Scientific and Statistical Computing, 5(3), 735-743.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_variables</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_samples</span> <span class="o">!=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;The number of independent and dependent variable are inconsistent&#39;</span><span class="p">)</span>
+
+    <span class="n">n_components</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">((</span><span class="n">n_components</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">))</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_variables</span><span class="p">,</span> <span class="n">n_components</span><span class="p">))</span>
+    <span class="n">x_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_components</span><span class="p">))</span>  <span class="c1"># X scores (standardized)</span>
+    <span class="n">x_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_variables</span><span class="p">,</span> <span class="n">n_components</span><span class="p">))</span>  <span class="c1"># X weights</span>
+    <span class="n">x_loadings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_variables</span><span class="p">,</span> <span class="n">n_components</span><span class="p">))</span>  <span class="c1"># X loadings</span>
+    <span class="n">y_loadings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_components</span><span class="p">))</span>  <span class="c1"># Y loadings</span>
+    <span class="n">y_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_components</span><span class="p">))</span>  <span class="c1"># Y scores</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>  <span class="c1"># cross-product matrix between the X and y_data</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_components</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">/</span> <span class="n">tt</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">/</span> <span class="n">tt</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">p</span>  
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>  <span class="c1"># Gram-Schimidt orthogonal</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x_scores</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x_scores</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">u</span><span class="p">))</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+        <span class="n">x_weights</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="n">x_scores</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="n">x_loadings</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="n">y_loadings</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
+        <span class="n">y_scores</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="n">V</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x_weights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">y_loadings</span><span class="o">.</span><span class="n">ravel</span><span class="p">())),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="n">B</span><span class="p">,</span> <span class="s1">&#39;x_scores&#39;</span><span class="p">:</span> <span class="n">x_scores</span><span class="p">,</span> <span class="s1">&#39;x_loadings&#39;</span><span class="p">:</span> <span class="n">x_loadings</span><span class="p">,</span> <span class="s1">&#39;y_loadings&#39;</span><span class="p">:</span> <span class="n">y_loadings</span><span class="p">,</span>
+            <span class="s1">&#39;x_scores_weights&#39;</span><span class="p">:</span> <span class="n">x_weights</span><span class="p">,</span> <span class="s1">&#39;x_weights&#39;</span><span class="p">:</span> <span class="n">x_weights</span><span class="p">,</span> <span class="s1">&#39;y_scores&#39;</span><span class="p">:</span> <span class="n">y_scores</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="sampleSplit_random"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.sampleSplit_random">[docs]</a><span class="k">def</span> <span class="nf">sampleSplit_random</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Randomly split a dataset into training and testing sets.</span>
+
+<span class="sd">    This function randomly splits a dataset into training and testing sets</span>
+<span class="sd">    using the train_test_split function from scikit-learn.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : numpy.ndarray</span>
+<span class="sd">        The dataset to split.</span>
+<span class="sd">    test_size : float, optional</span>
+<span class="sd">        The proportion of the dataset to include in the test split.</span>
+<span class="sd">    random_state : int, optional</span>
+<span class="sd">        The random seed to use for reproducibility.</span>
+<span class="sd">    shuffle : bool, optional</span>
+<span class="sd">        Whether or not to shuffle the dataset before splitting.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    trainIdx : numpy.ndarray</span>
+<span class="sd">        The indices of the training set.</span>
+<span class="sd">    testIdx : numpy.ndarray</span>
+<span class="sd">        The indices of the testing set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sampleIdx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">trainIdx</span><span class="p">,</span> <span class="n">testIdx</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">sampleIdx</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
+                                         <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+                                         <span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">trainIdx</span><span class="p">,</span> <span class="n">testIdx</span></div>
+
+
+<div class="viewcode-block" id="sampleSplit_KS"><a class="viewcode-back" href="../../pynir.html#pynir.Calibration.sampleSplit_KS">[docs]</a><span class="k">def</span> <span class="nf">sampleSplit_KS</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Split a dataset into training and testing sets using the KS algorithm.</span>
+
+<span class="sd">    This function splits a dataset into training and testing sets using the KS algorithm,</span>
+<span class="sd">    which selects points that maximize the minimum distance between them and previously</span>
+<span class="sd">    selected points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : numpy.ndarray</span>
+<span class="sd">        The dataset to split.</span>
+<span class="sd">    test_size : float, optional</span>
+<span class="sd">        The proportion of the dataset to include in the test split.</span>
+<span class="sd">    metric : str, optional</span>
+<span class="sd">        The distance metric to use for computing distances between points.</span>
+<span class="sd">    *args : tuple</span>
+<span class="sd">        Additional arguments to pass to the distance metric function.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Additional keyword arguments to pass to the distance metric function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    trainIdx : numpy.ndarray</span>
+<span class="sd">        The indices of the training set.</span>
+<span class="sd">    testIdx : numpy.ndarray</span>
+<span class="sd">        The indices of the testing set.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This implementation is based on the algorithm described in:</span>
+<span class="sd">    K. S. Lee, &quot;Automatic thresholding for defect detection,&quot; Pattern Recognition, vol. 21, no. 3, pp. 225-238, 1988.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Xscore</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">Xscore</span><span class="p">,</span> <span class="n">Xscore</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">select_pts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">remaining_pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">distance</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+    <span class="c1"># first select 2 farthest points</span>
+    <span class="n">first_2pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">distance</span><span class="p">),</span> <span class="n">distance</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">select_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">first_2pts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">select_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">first_2pts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># remove the first 2 points from the remaining list</span>
+    <span class="n">remaining_pts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">first_2pts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">remaining_pts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">first_2pts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">test_size</span><span class="p">))</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="c1"># find the maximum minimum distance</span>
+        <span class="n">select_distance</span> <span class="o">=</span> <span class="n">distance</span><span class="p">[</span><span class="n">select_pts</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">min_distance</span> <span class="o">=</span> <span class="n">select_distance</span><span class="p">[:,</span> <span class="n">remaining_pts</span><span class="p">]</span>
+        <span class="n">min_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">min_distance</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">max_min_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">min_distance</span><span class="p">)</span>
+
+        <span class="c1"># select the first point (in case that several distances are the same, choose the first one)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">select_distance</span> <span class="o">==</span> <span class="n">max_min_distance</span><span class="p">)[</span>
+            <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">select_pts</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">select_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+                <span class="n">remaining_pts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+                <span class="k">break</span>
+    <span class="k">return</span> <span class="n">select_pts</span><span class="p">,</span> <span class="n">remaining_pts</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pynir</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Jin Zhang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

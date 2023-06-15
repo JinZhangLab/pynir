@@ -9,30 +9,33 @@ from scipy.stats import norm
 
 def simulateNIR(nSample = 100, n_components = 3, refType = 1, noise = 0.0, seeds = 1):
     """
-    simulating NIR spectra
+    Simulate NIR spectra.
 
     Parameters
     ----------
     nSample : int, optional
-        number of samples. The default is 100.
-
+        The number of samples to simulate. The default is 100.
     n_components : int, optional
-        number of componnet for spectral simulation. The default is 3.
-
+        The number of components for spectral simulation. The default is 3.
     refType : int, optional
-        type of reference value
-        None for no reference value output
-        1 for contious values as reference value output
-        2 or the larger integer for binary or class output.
-
-    seeds : int, optimal
-        random seed for generating spectra and reference values. The default is 1.
+        The type of reference value to generate:
+        - None for no reference value output
+        - 1 for continuous values as reference value output
+        - 2 or larger integer for binary or class output.
+        The default is 1.
+    noise : float, optional
+        The amount of noise to add to the simulated spectra. The default is 0.0.
+    seeds : int, optional
+        The random seed for generating spectra and reference values. The default is 1.
 
     Returns
     -------
-    X:  matrix, simulated NIR spectra matrix.
-    y: array, concentration or class of all samples.
-
+    X : numpy.ndarray
+        The simulated NIR spectra matrix.
+    y : numpy.ndarray
+        The concentration or class of all samples.
+    wv : numpy.ndarray
+        The wavelengths of the spectra.
     """
     wv = np.linspace(1000,2500,500) #wavelength
     np.random.seed(seeds)
@@ -64,33 +67,42 @@ def simulateNIR(nSample = 100, n_components = 3, refType = 1, noise = 0.0, seeds
 
 def simulateNIR_calibrationTransfer(nSample = 100, n_components = 3,shifts = 0.01, refType = 1, noise = 0.0, seeds = 1):
     """
-    simulating NIR spectra for calibration transfer
+    Simulate NIR spectra for calibration transfer.
 
     Parameters
     ----------
     nSample : int, optional
-        number of samples. The default is 100.
+        The number of samples to simulate. The default is 100.
 
     n_components : int, optional
-        number of componnet for spectral simulation. The default is 3.
+        The number of components for spectral simulation. The default is 3.
 
-    shifts: float, optimal
-        shift level of base peaks for simulte secondary NIR spectra data
+    shifts: float, optional
+        The shift level of base peaks for simulating secondary NIR spectra data.
 
     refType : int, optional
-        type of reference value
-        None for no reference value output
-        1 for contious values as reference value output
-        2 or the larger integer for binary or class output.
+        The type of reference value to generate:
+        - None for no reference value output
+        - 1 for continuous values as reference value output
+        - 2 or larger integer for binary or class output.
+        The default is 1.
 
-    seeds : int, optimal
-        random seed for generating spectra and reference values. The default is 1.
+    noise : float, optional
+        The amount of noise to add to the simulated spectra. The default is 0.0.
+
+    seeds : int, optional
+        The random seed for generating spectra and reference values. The default is 1.
 
     Returns
     -------
-    X:  matrix, simulated NIR spectra matrix.
-    y: array, concentration or class of all samples.
-
+    X1 : numpy.ndarray
+        The simulated NIR spectra matrix for the first set of spectra.
+    X2 : numpy.ndarray
+        The simulated NIR spectra matrix for the second set of spectra.
+    y : numpy.ndarray
+        The concentration or class of all samples.
+    wv : numpy.ndarray
+        The wavelengths of the spectra.
     """
     wv = np.linspace(1000,2500,500) #wavelength
     np.random.seed(seeds)

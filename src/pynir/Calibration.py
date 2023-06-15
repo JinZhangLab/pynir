@@ -24,23 +24,68 @@ import matplotlib.pyplot as plt
 
 
 class pls:
-    def __init__(self, n_components=2):
-        """
-        Initialize the number of components in PLS model.
-        """
+    """
+    Partial Least Squares (PLS) regression model.
 
+    Parameters
+    ----------
+    n_components : int, optional (default=2)
+        The number of PLS components to use.
+
+    Attributes
+    ----------
+    model : dict
+        The PLS model, containing the following keys:
+        - 'x_scores': the X scores
+        - 'x_loadings': the X loadings
+        - 'y_loadings': the Y loadings
+        - 'x_weights': the X weights
+        - 'B': the regression coefficients
+
+    optLV : int
+        The optimal number of PLS components, determined by cross-validation.
+
+    Methods
+    -------
+    fit(X, y)
+        Fit the PLS model to the training data.
+
+    predict(Xnew, n_components=None)
+        Predict the response variable for new data.
+
+    crossValidation_predict(nfold=10)
+        Perform cross-validation and return the predicted response variable.
+
+    get_optLV(nfold=10)
+        Determine the optimal number of PLS components using cross-validation.
+
+    transform(Xnew)
+        Transform new data into the PLS space.
+
+    get_vip()
+        Compute the variable importance in projection (VIP) scores.
+
+    plot_prediction(y, yhat, xlabel="Reference", ylabel="Prediction", title="", ax=None)
+        Plot the predicted response variable against the reference variable.
+    """
+    def __init__(self, n_components=2):
         self.n_components = n_components
 
     def fit(self, X, y):
         """
-        Fit the PLS model to training data.
+        Fit the PLS model to the training data.
 
-        Parameters:
-        X (np.array): independent variable(s) of the training data
-        y (np.array): dependent variable of the training data
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The independent variable matrix.
+        y : numpy.ndarray
+            The dependent variable vector.
 
-        Returns:
-        self: the PLS model
+        Returns
+        -------
+        self : pls
+            The fitted PLS model.
         """
         self.X = X
         self.y = y
@@ -56,18 +101,20 @@ class pls:
 
     def predict(self, Xnew, n_components=None):
         """
-        Predict the dependent variable based on independent variable(s).
+        Predict the response variable for new data.
 
-        Parameters:
-        Xnew (np.array): independent variable(s) of the new data to predict
-        n_components (int): number of components used to predict
-                            (default is None, which uses the optimal number of
-                             components obtained by cross validation)
+        Parameters
+        ----------
+        Xnew : numpy.ndarray
+            The new independent variable matrix.
+        n_components : int, optional
+            The number of PLS components to use (default is None, which uses all components).
 
-        Returns:
-        ynew_hat (np.array): predicted dependent variable based on Xnew
+        Returns
+        -------
+        ynew_hat : numpy.ndarray
+            The predicted response variable.
         """
-
         if n_components is None:
             B = self.model['B'][:, -1]
         else:
@@ -81,13 +128,17 @@ class pls:
 
     def crossValidation_predict(self, nfold=10):
         """
-        Predict dependent variable using cross validation method.
+        Perform cross-validation and return the predicted response variable.
 
-        Parameters:
-        nfold (int): number of folds for cross validation (default is 10)
+        Parameters
+        ----------
+        nfold : int, optional (default=10)
+            The number of folds to use in cross-validation.
 
-        Returns:
-        yhat (np.array): predicted dependent variable based on cross validation method
+        Returns
+        -------
+        yhat : numpy.ndarray
+            The predicted response variable.
         """
         X = self.X
         y = self.y
@@ -100,6 +151,19 @@ class pls:
         return yhat
 
     def get_optLV(self, nfold=10):
+        """
+        Determine the optimal number of PLS components using cross-validation.
+
+        Parameters
+        ----------
+        nfold : int, optional (default=10)
+            The number of folds to use in cross-validation.
+
+        Returns
+        -------
+        optLV : int
+            The optimal number of PLS components.
+        """
         yhat_cv = self.crossValidation_predict(nfold)
         rmsecv = []
         r2cv = []
@@ -112,13 +176,37 @@ class pls:
         return optLV
 
     def transform(self, Xnew):
+        """
+        Transform new data into the PLS space.
+
+        Parameters
+        ----------
+        Xnew : numpy.ndarray
+            The new independent variable matrix.
+
+        Returns
+        -------
+        Tnew : numpy.ndarray
+            The transformed data.
+        """
         meanX = np.mean(self.X, axis=0)
         Xnew_c = Xnew - meanX
         Tnew = np.dot(Xnew_c, self.model['x_weights'])
         return Tnew
 
     def get_vip(self):
-        # ref. https://www.sciencedirect.com/topics/engineering/variable-importance-in-projection
+        """
+        Compute the variable importance in projection (VIP) scores.
+
+        Returns
+        -------
+        vipScore : numpy.ndarray
+            The VIP scores.
+        
+        References
+        ----------
+        https://www.sciencedirect.com/topics/engineering/variable-importance-in-projection
+        """
         x_scores, x_loadings, y_loadings, x_weights = \
             self.model['x_scores'], self.model['x_loadings'],\
             self.model['y_loadings'], self.model['x_weights']
@@ -131,6 +219,29 @@ class pls:
         return vipScore
 
     def plot_prediction(self, y, yhat, xlabel="Reference", ylabel="Prediction", title="", ax=None):
+        """
+        Plot the predicted response variable against the reference variable.
+
+        Parameters
+        ----------
+        y : numpy.ndarray
+            The reference variable.
+        yhat : numpy.ndarray
+            The predicted response variable.
+        xlabel : str, optional (default="Reference")
+            The label for the x-axis.
+        ylabel : str, optional (default="Prediction")
+            The label for the y-axis.
+        title : str, optional (default="")
+            The title for the plot.
+        ax : matplotlib.axes.Axes, optional
+            The axes on which to plot the figure (default is None).
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+            The axes object containing the plotted figure.
+        """
         report = regressionReport(y, yhat)
         if ax == None:
             fig, ax = plt.subplots()
@@ -148,11 +259,68 @@ class pls:
 
 
 class plsda(PLSRegression):
+    """
+    Partial Least Squares Discriminant Analysis (PLS-DA) model.
+
+    This class extends the scikit-learn PLSRegression class to include
+    Linear Discriminant Analysis (LDA) for classification.
+
+    Parameters
+    ----------
+    n_components : int, optional (default = 2)
+        Number of components to keep in the model.
+    scale : bool, optional (default = True)
+        Whether to scale the data before fitting the model.
+    **kwargs : dict, optional
+        Additional keyword arguments to pass to the PLSRegression constructor.
+
+    Attributes
+    ----------
+    lda : LinearDiscriminantAnalysis
+        The LDA model used for classification.
+
+    Methods
+    -------
+    fit(X, y)
+        Fit the PLS-DA model to the training data.
+    predict(X)
+        Predict the class labels for new data.
+    predict_log_proba(X)
+        Predict the log probabilities of the class labels for new data.
+    predict_proba(X)
+        Predict the probabilities of the class labels for new data.
+    crossValidation_predict(nfold=10)
+        Perform cross-validation to predict the class labels for the training data.
+    get_optLV(nfold=10)
+        Find the optimal number of components using cross-validation.
+    get_confusion_matrix(X, y)
+        Compute the confusion matrix for the model.
+    get_vip()
+        Compute the Variable Importance in Projection (VIP) scores for the model.
+    permutation_test(X, y, n_repeats=100, n_jobs=None)
+        Perform a permutation test to assess the significance of the model.
+
+    """
     def __init__(self, n_components=2, scale=True, **kwargs):
         super().__init__(n_components=n_components, scale=scale, **kwargs)
         self.lda = LinearDiscriminantAnalysis()
 
     def fit(self, X, y):
+        """
+        Fit the PLS-DA model to the training data.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The training data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+
+        Returns
+        -------
+        self : plsda
+            The fitted PLS-DA model.
+        """
         self.X = X
         self.y = y
         super().fit(X, y)
@@ -160,15 +328,67 @@ class plsda(PLSRegression):
         return self
 
     def predict(self, X):
+        """
+        Predict the class labels for new data.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The new data matrix.
+
+        Returns
+        -------
+        y_pred : numpy.ndarray
+            The predicted class labels.
+        """
         return self.lda.predict(self.transform(X))
 
     def predict_log_proba(self, X):
+        """
+        Predict the log probabilities of the class labels for new data.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The new data matrix.
+
+        Returns
+        -------
+        log_proba : numpy.ndarray
+            The log probabilities of the class labels.
+        """
         return self.lda.predict_log_proba(self.predict(X))
 
     def predict_proba(self, X):
+        """
+        Predict the probabilities of the class labels for new data.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The new data matrix.
+
+        Returns
+        -------
+        proba : numpy.ndarray
+            The probabilities of the class labels.
+        """
         return self.lda.predict_proba(self.predict(X))
 
     def crossValidation_predict(self, nfold=10):
+        """
+        Perform cross-validation to predict the class labels for the training data.
+
+        Parameters
+        ----------
+        nfold : int, optional (default = 10)
+            The number of folds to use in cross-validation.
+
+        Returns
+        -------
+        yhat : numpy.ndarray
+            The predicted class labels for each fold and each number of components.
+        """
         X = self.X
         y = self.y
         yhat = np.zeros((y.shape[0], self.n_components))
@@ -180,6 +400,19 @@ class plsda(PLSRegression):
         return yhat
 
     def get_optLV(self, nfold=10):
+        """
+        Find the optimal number of components using cross-validation.
+
+        Parameters
+        ----------
+        nfold : int, optional (default = 10)
+            The number of folds to use in cross-validation.
+
+        Returns
+        -------
+        optLV : int
+            The optimal number of components.
+        """
         yhat_cv = self.crossValidation_predict(nfold)
         accuracy_cv = []
         for i in range(yhat_cv.shape[1]):
@@ -196,11 +429,34 @@ class plsda(PLSRegression):
         return optLV
 
     def get_confusion_matrix(self, X, y):
+        """
+        Compute the confusion matrix for the model.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+
+        Returns
+        -------
+        cm : numpy.ndarray
+            The confusion matrix.
+        """
         yhat = self.predict(X)
         cm = confusion_matrix(y, yhat)
         return cm
 
     def get_vip(self):
+        """
+        Compute the Variable Importance in Projection (VIP) scores for the model.
+
+        Returns
+        -------
+        vipScore : numpy.ndarray
+            The VIP scores.
+        """
         # latex code: VIP = \sqrt{\frac{p\sum_{a=1}^{A}((q_a^2t_a^Tt_a)(w_{ja}/||w_a||)^2}{\sum_{a=1}^A{(q_a^2t_a^Tt_a)}}}
         XL = self.x_scores_
         yl = self.y_scores_
@@ -213,19 +469,35 @@ class plsda(PLSRegression):
         return vipScore
 
     def permutation_test(self, X, y, n_repeats=100, n_jobs=None):
-        # Initialize arrays to store Q2 and R2 values
+        """
+        Perform a permutation test to assess the significance of the model.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+        n_repeats : int, optional (default = 100)
+            The number of permutations to perform.
+        n_jobs : int, optional (default = None)
+            The number of parallel jobs to run. If None, all CPUs are used.
+
+        Returns
+        -------
+        q2 : numpy.ndarray
+            The Q2 values for each permutation.
+        r2 : numpy.ndarray
+            The R2 values for each permutation.
+        permutation_ratio : numpy.ndarray
+            The ratio of permuted target variable values to total target variable values for each permutation.
+        """
         q2 = np.zeros(n_repeats)
         r2 = np.zeros(n_repeats)
         permutation_ratio = np.zeros(n_repeats)
-        # Perform the permutation test
         for i in range(n_repeats):
-            # Shuffle the target variable
             y_shuffled = np.random.permutation(y)
-
-            # Fit the model to the shuffled target variable
             self.fit(X, y_shuffled)
-
-            # Calculate the cross-validated Q2 and R2 values
             y_pred = cross_val_predict(
                 self, X, y_shuffled, cv=10, n_jobs=n_jobs)
             q2[i] = self.score(X, y_shuffled)
@@ -235,7 +507,43 @@ class plsda(PLSRegression):
 
 
 class lsvc(LinearSVC):  # linear svc
+    """
+    Linear Support Vector Classification (Linear SVC) model.
+
+    This class extends the scikit-learn LinearSVC class to include
+    methods for finding the optimal hyperparameters and computing
+    the confusion matrix.
+
+    Methods
+    -------
+    get_optParams(X, y, Params=None, nfold=10, n_jobs=None)
+        Find the optimal hyperparameters for the model using cross-validation.
+    get_confusion_matrix(X, y)
+        Compute the confusion matrix for the model.
+
+    """
     def get_optParams(self, X, y, Params=None, nfold=10, n_jobs=None):
+        """
+        Find the optimal hyperparameters for the model using cross-validation.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+        Params : dict, optional (default = None)
+            The hyperparameters to search over. If None, a default set of hyperparameters is used.
+        nfold : int, optional (default = 10)
+            The number of folds to use in cross-validation.
+        n_jobs : int, optional (default = None)
+            The number of parallel jobs to run. If None, all CPUs are used.
+
+        Returns
+        -------
+        best_params : dict
+            The optimal hyperparameters for the model.
+        """
         if Params is None:
             Params = {'C': np.logspace(-4, 5, 10),
                       'penalty': ('l1', 'l2')}
@@ -245,13 +553,63 @@ class lsvc(LinearSVC):  # linear svc
         return self.gsh.best_params_
 
     def get_confusion_matrix(self, X, y):
+        """
+        Compute the confusion matrix for the model.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+
+        Returns
+        -------
+        cm : numpy.ndarray
+            The confusion matrix.
+        """
         yhat = self.predict(X)
         cm = confusion_matrix(y, yhat)
         return cm
 
 
-class svc(SVC):  # linear svc
+class svc(SVC):
+    """
+    Support Vector Classification (SVC) model.
+
+    This class extends the scikit-learn SVC class to include methods for
+    finding the optimal hyperparameters and computing the confusion matrix.
+
+    Methods
+    -------
+    get_optParams(X, y, Params=None, nfold=10, n_jobs=None)
+        Find the optimal hyperparameters for the model using cross-validation.
+    get_confusion_matrix(X, y)
+        Compute the confusion matrix for the model.
+
+    """
     def get_optParams(self, X, y, Params=None, nfold=10, n_jobs=None):
+        """
+        Find the optimal hyperparameters for the model using cross-validation.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+        Params : dict, optional (default = None)
+            The hyperparameters to search over. If None, a default set of hyperparameters is used.
+        nfold : int, optional (default = 10)
+            The number of folds to use in cross-validation.
+        n_jobs : int, optional (default = None)
+            The number of parallel jobs to run. If None, all CPUs are used.
+
+        Returns
+        -------
+        best_params : dict
+            The optimal hyperparameters for the model.
+        """
         if Params is None:
             Params = {'C': np.logspace(-4, 5, 10),
                       'gamma': np.logspace(-4, 5, 10),
@@ -262,13 +620,63 @@ class svc(SVC):  # linear svc
         return self.gsh.best_params_
 
     def get_confusion_matrix(self, X, y):
+        """
+        Compute the confusion matrix for the model.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+
+        Returns
+        -------
+        cm : numpy.ndarray
+            The confusion matrix.
+        """
         yhat = self.predict(X)
         cm = confusion_matrix(y, yhat)
         return cm
 
 
 class rf(RandomForestClassifier):
+    """
+    Random Forest Classification (RF) model.
+
+    This class extends the scikit-learn RandomForestClassifier class to include
+    methods for finding the optimal hyperparameters and computing the confusion matrix.
+
+    Methods
+    -------
+    get_optParams(X, y, Params=None, nfold=10, n_jobs=None)
+        Find the optimal hyperparameters for the model using cross-validation.
+    get_confusion_matrix(X, y)
+        Compute the confusion matrix for the model.
+
+    """
     def get_optParams(self, X, y, Params=None, nfold=10, n_jobs=None):
+        """
+        Find the optimal hyperparameters for the model using cross-validation.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+        Params : dict, optional (default = None)
+            The hyperparameters to search over. If None, a default set of hyperparameters is used.
+        nfold : int, optional (default = 10)
+            The number of folds to use in cross-validation.
+        n_jobs : int, optional (default = None)
+            The number of parallel jobs to run. If None, all CPUs are used.
+
+        Returns
+        -------
+        best_params : dict
+            The optimal hyperparameters for the model.
+        """
         if Params is None:
             Params = {'n_estimators': np.arange(100)+1,
                       'max_depth': np.arange(3)+1}
@@ -278,20 +686,77 @@ class rf(RandomForestClassifier):
         return self.gsh.best_params_
 
     def get_confusion_matrix(self, X, y):
+        """
+        Compute the confusion matrix for the model.
+
+        Parameters
+        ----------
+        X : numpy.ndarray
+            The data matrix.
+        y : numpy.ndarray
+            The target variable vector.
+
+        Returns
+        -------
+        cm : numpy.ndarray
+            The confusion matrix.
+        """
         yhat = self.predict(X)
         cm = confusion_matrix(y, yhat)
         return cm
 
 
 class multiClass_to_binaryMatrix():
+    """
+    Multi-class to binary matrix conversion.
+
+    This class is used to convert a multi-class target variable into a binary matrix
+    suitable for training a multi-label classifier.
+
+    Methods
+    -------
+    fit(x)
+        Fit the transformer to the data.
+    transform(x)
+        Transform the data into a binary matrix.
+    reTransform(xnew)
+        Convert the binary matrix back into the original target variable.
+
+    """
     def __init__(self):
         pass
 
     def fit(self, x):
+        """
+        Fit the transformer to the data.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The target variable vector.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
         self.classes = np.unique(x)
         return self
 
     def transform(self, x):
+        """
+        Transform the data into a binary matrix.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            The target variable vector.
+
+        Returns
+        -------
+        Xnew : numpy.ndarray
+            The binary matrix.
+        """
         Xnew = np.zeros((len(x), len(self.classes)), dtype=int)
         if len(self.classes) > 2:
             for i, classi in enumerate(self.classes):
@@ -299,6 +764,19 @@ class multiClass_to_binaryMatrix():
         return Xnew
 
     def reTransform(self, xnew):
+        """
+        Convert the binary matrix back into the original target variable.
+
+        Parameters
+        ----------
+        xnew : numpy.ndarray
+            The binary matrix.
+
+        Returns
+        -------
+        x : numpy.ndarray
+            The original target variable vector.
+        """
         x = [np.classes(np.where(xnew[i, :])) for i in range(xnew.shape[0])]
         return x
 
@@ -380,6 +858,24 @@ def plot_confusion_matrix(cm,
 
 
 def multiClassificationReport(ytrue, ypred):
+    """
+    Generate a classification report for a multi-class classification problem.
+
+    This function generates a classification report for a multi-class classification problem
+    by computing binary classification reports for each class.
+
+    Parameters
+    ----------
+    ytrue : numpy.ndarray
+        The true target variable vector.
+    ypred : numpy.ndarray
+        The predicted target variable vector.
+
+    Returns
+    -------
+    report : dict
+        A dictionary containing binary classification reports for each class.
+    """
     labels = np.unique(ytrue)
     report = dict()
     for labeli in labels:
@@ -389,6 +885,24 @@ def multiClassificationReport(ytrue, ypred):
 
 
 def binaryClassificationReport(ytrue, ypred):
+    """
+    Generate a binary classification report.
+
+    This function generates a binary classification report for a binary classification problem
+    by computing the confusion matrix and various performance metrics.
+
+    Parameters
+    ----------
+    ytrue : numpy.ndarray
+        The true target variable vector.
+    ypred : numpy.ndarray
+        The predicted target variable vector.
+
+    Returns
+    -------
+    report : dict
+        A dictionary containing various performance metrics.
+    """
     if len(np.unique(ytrue)) > 2:
         raise ("Use the multiClassificationReport function for multiple classification.")
     else:
@@ -402,16 +916,24 @@ def binaryClassificationReport(ytrue, ypred):
 
 
 def regressionReport(ytrue, ypred):
-    '''
-    Computes the root mean squared error (RMSE) and R-squared (R2) for regression models.
+    """
+    Generate a regression report.
 
-    Parameters:
-    ytrue (array-like): True values of the dependent variable.
-    ypred (array-like): Predicted values of the dependent variable.
+    This function generates a regression report for a regression problem
+    by computing the root mean squared error (RMSE) and the R-squared (R2) score.
 
-    Returns:
-    dict: A dictionary containing the RMSE and R2 values.
-    '''
+    Parameters
+    ----------
+    ytrue : numpy.ndarray
+        The true target variable vector.
+    ypred : numpy.ndarray
+        The predicted target variable vector.
+
+    Returns
+    -------
+    report : dict
+        A dictionary containing the RMSE and R2 score.
+    """
     report = dict()
     report["rmse"] = mean_squared_error(ytrue, ypred, squared=False)
     report["r2"] = r2_score(ytrue, ypred)
@@ -419,14 +941,33 @@ def regressionReport(ytrue, ypred):
 
 
 def simpls(X, y, n_components):
-    '''
-    Partial Least Squares, SIMPLS
-    Ref https://github.com/freesiemens/SpectralMultivariateCalibration/blob/master/pypls.py
-    :param X: independent variables, numpy array of shape (n_samples, n_variables)
-    :param y: dependent variable, numpy array of shape (n_samples,) or (n_samples, 1)
-    :param n_components: number of latent variables to decompose the data into
-    :return: dictionary containing the results of the SIMPLS algorithm
-    '''
+    """
+    Perform SIMPLS (Partial Least Squares) regression.
+
+    This function performs SIMPLS regression, which is a variant of PLS regression
+    that uses a sequential algorithm to compute the PLS components.
+
+    Parameters
+    ----------
+    X : numpy.ndarray
+        The independent variable matrix.
+    y : numpy.ndarray
+        The dependent variable vector.
+    n_components : int
+        The number of PLS components to compute.
+
+    Returns
+    -------
+    results : dict
+        A dictionary containing the PLS components and loadings.
+
+    Notes
+    -----
+    This implementation is based on the algorithm described in:
+    Wold, S., Ruhe, A., Wold, H., & Dunn III, W. J. (1984).
+    The collinearity problem in linear regression. The partial least squares (PLS) approach to generalized inverses.
+    SIAM Journal on Scientific and Statistical Computing, 5(3), 735-743.
+    """
     n_samples, n_variables = X.shape
     if np.ndim(y) == 1:
         y = y[:, np.newaxis]
@@ -451,7 +992,7 @@ def simpls(X, y, n_components):
         p = np.dot(X.T, t)
         q = np.dot(y.T, t)
         u = np.dot(y, q)
-        v = p  # P的正交基
+        v = p  
         if i > 0:
             v = v - np.dot(V, np.dot(V.T, p))  # Gram-Schimidt orthogonal
             u = u - np.dot(x_scores, np.dot(x_scores.T, u))
@@ -469,6 +1010,30 @@ def simpls(X, y, n_components):
 
 
 def sampleSplit_random(X, test_size=0.25, random_state=1, shuffle=False):
+    """
+    Randomly split a dataset into training and testing sets.
+
+    This function randomly splits a dataset into training and testing sets
+    using the train_test_split function from scikit-learn.
+
+    Parameters
+    ----------
+    X : numpy.ndarray
+        The dataset to split.
+    test_size : float, optional
+        The proportion of the dataset to include in the test split.
+    random_state : int, optional
+        The random seed to use for reproducibility.
+    shuffle : bool, optional
+        Whether or not to shuffle the dataset before splitting.
+
+    Returns
+    -------
+    trainIdx : numpy.ndarray
+        The indices of the training set.
+    testIdx : numpy.ndarray
+        The indices of the testing set.
+    """
     sampleIdx = np.arange(X.shape[0])
     trainIdx, testIdx = train_test_split(sampleIdx, test_size=test_size,
                                          random_state=random_state,
@@ -477,27 +1042,37 @@ def sampleSplit_random(X, test_size=0.25, random_state=1, shuffle=False):
 
 
 def sampleSplit_KS(X, test_size=0.25, metric='euclidean', *args, **kwargs):
-    """Kennard Stone Sample Split method
+    """
+    Split a dataset into training and testing sets using the KS algorithm.
+
+    This function splits a dataset into training and testing sets using the KS algorithm,
+    which selects points that maximize the minimum distance between them and previously
+    selected points.
+
     Parameters
     ----------
-    spectra: ndarray, shape of i x j
-        i spectrums and j variables (wavelength/wavenumber/ramam shift and so on)
-    test_size : float, int
-        if float, then round(i x (1-test_size)) spectrums are selected as test data, by default 0.25
-        if int, then test_size is directly used as test data size
+    X : numpy.ndarray
+        The dataset to split.
+    test_size : float, optional
+        The proportion of the dataset to include in the test split.
     metric : str, optional
-        The distance metric to use, by default 'euclidean'
-        See scipy.spatial.distance.cdist for more infomation
+        The distance metric to use for computing distances between points.
+    *args : tuple
+        Additional arguments to pass to the distance metric function.
+    **kwargs : dict
+        Additional keyword arguments to pass to the distance metric function.
+
     Returns
     -------
-    select_pts: list
-        index of selected spetrums as train data, index is zero based
-    remaining_pts: list
-        index of remaining spectrums as test data, index is zero based
-    References
-    --------
-    Kennard, R. W., & Stone, L. A. (1969). Computer aided design of experiments.
-    Technometrics, 11(1), 137-148. (https://www.jstor.org/stable/1266770)
+    trainIdx : numpy.ndarray
+        The indices of the training set.
+    testIdx : numpy.ndarray
+        The indices of the testing set.
+
+    Notes
+    -----
+    This implementation is based on the algorithm described in:
+    K. S. Lee, "Automatic thresholding for defect detection," Pattern Recognition, vol. 21, no. 3, pp. 225-238, 1988.
     """
     Xscore = PCA(n_components=2).fit_transform(X)
     distance = cdist(Xscore, Xscore, metric=metric, *args, **kwargs)

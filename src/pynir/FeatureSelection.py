@@ -14,6 +14,34 @@ from .Preprocessing import smooth
 
 # Single step feature selection method
 class MCUVE:
+    """
+    Multi-Component Uninformative Variable Elimination (MCUVE) for feature selection.
+
+    This class implements the MCUVE algorithm for feature selection, which is a method
+    for identifying the most informative features in a dataset.
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        The independent variables.
+    y : numpy.ndarray
+        The dependent variable.
+    ncomp : int, optional
+        The number of latent components.
+    nrep : int, optional
+        The number of repetitions.
+    testSize : float, optional
+        The proportion of the dataset to include in the test split.
+
+    Attributes
+    ----------
+    criteria : numpy.ndarray
+        The criteria for feature selection.
+    featureRank : numpy.ndarray
+        The rank of the features based on their criteria.
+    featureR2 : list
+        The R^2 score for each number of selected features.
+    """
     def __init__(self, x, y, ncomp=2, nrep=500, testSize=0.2):
         self.x = x
         self.y = y
@@ -24,6 +52,14 @@ class MCUVE:
 
 
     def fit(self):
+        """
+        Fit the MCUVE model to the training data.
+
+        Returns
+        -------
+        self : MCUVE
+            The fitted MCUVE model.
+        """
         PLSCoef = np.zeros((self.nrep, self.x.shape[1]))
         ss = ShuffleSplit(n_splits=self.nrep, test_size=self.testSize)
         step = 0
@@ -61,8 +97,30 @@ class MCUVE:
         selFeatures = self.featureRank[:nSelFeatures]
         return X[:, selFeatures]
                 
-# Feature selection with random test method
 class RT(MCUVE):
+    """
+    Random Test (RT) feature selection method based on cross-validation.
+
+    This class implements the RT algorithm for feature selection, which is a method for selecting the most
+    informative features from a dataset based on their ability to predict the target variable using cross-validation.
+
+    Parameters
+    ----------
+    ncomp : int, optional
+        The number of components to use in PLS regression.
+    nrep : int, optional
+        The number of repetitions to use in the random test.
+
+    Attributes
+    ----------
+    criteria : numpy.ndarray
+        The criteria for feature selection.
+    featureRank : numpy.ndarray
+        The ranked indices of the selected features.
+    featureR2 : list of float
+        The R^2 scores for each number of selected features.
+
+    """
     def fit(self):
         # calculate normal pls regression coefficient
         plsmodel0=PLSRegression(self.ncomp)
@@ -98,10 +156,49 @@ class RT(MCUVE):
         return self
 
 
-# Feature selection based on the criterion of C values
-# Ref. [1]	Zhang J., et.al. A variable importance criterion for variable selection in near-infrared spectral analysis [J]. Science China-Chemistry, 2019, 62(2): 271-279.
+
 class VC(RT):
+    """
+    Variable Importance Criterion (VC) feature selection based on PLS regression.
+
+    This class implements the VC algorithm for feature selection based on the criterion of C values,
+    which is a method for selecting the most important variables in near-infrared spectral analysis.
+
+    Parameters
+    ----------
+    cv : int, optional
+        The number of cross-validation folds to use.
+    isSmooth : bool, optional
+        Whether to apply smoothing to the criteria.
+
+    Attributes
+    ----------
+    criteria : numpy.ndarray
+        The VC criteria for each variable.
+    featureRank : numpy.ndarray
+        The indices of the variables sorted by their VC criteria.
+
+    Notes
+    -----
+    This implementation is based on the algorithm described in:
+    [1] Zhang J., et.al. A variable importance criterion for variable selection in near-infrared spectral analysis [J]. Science China-Chemistry, 2019, 62(2): 271-279.
+    """
     def fit(self, cv=5, isSmooth = True):
+        """
+        Fit the VC model to the training data.
+
+        Parameters
+        ----------
+        cv : int, optional
+            The number of cross-validation folds to use.
+        isSmooth : bool, optional
+            Whether to apply smoothing to the criteria.
+
+        Returns
+        -------
+        self : VC
+            The fitted VC model.
+        """
         # calculate normal pls regression coefficient
         nVar = self.x.shape[1]
         sampleMatrix = np.ndarray([self.nrep,self.x.shape[1]], dtype=int)
@@ -129,8 +226,43 @@ class VC(RT):
         self.featureRank = np.argsort(self.criteria)
         return self
 
-# Recursive feature selection based on the criterion of C values
 class MSVC:
+    """
+    Multi-Step Variable Importance Criterion (MSVC) for recursive feature selection.
+
+    This class implements the MSVC algorithm for recursive feature selection, which is a method
+    for selecting the most important features in a dataset based on their contribution to the
+    prediction of a target variable.
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        The independent variable matrix.
+    y : numpy.ndarray
+        The dependent variable vector.
+    ncomp : int, optional
+        The number of latent components to use in the PLS regression model.
+    nrep : int, optional
+        The number of repetitions to use in the VC algorithm.
+    ncut : int, optional
+        The number of feature selection stages to perform.
+    testSize : float, optional
+        The proportion of the dataset to use for testing in cross-validation.
+
+    Attributes
+    ----------
+    criteria : numpy.ndarray
+        The VC criteria for each feature at each stage of feature selection.
+    featureR2 : numpy.ndarray
+        The R-squared score for each stage of feature selection.
+    selFeature : numpy.ndarray
+        The boolean mask indicating the selected features.
+
+    Notes
+    -----
+    This implementation is based on the algorithm described in:
+    [1] Zhang J., et.al. A variable importance criterion for variable selection in near-infrared spectral analysis [J]. Science China-Chemistry, 2019, 62(2): 271-279.
+    """
     def __init__(self, x, y, ncomp=1, nrep=7000, ncut=50, testSize=0.2):
         self.x = x
         self.y = y
@@ -184,6 +316,33 @@ def plotFeatureSelection(wv, X, selFeatures, methodNames = None,
                          xlabel = "Wavelength (nm)",
                          title = "Feature selection results",
                          ax = None):
+    """
+    Plot the results of feature selection.
+
+    Parameters
+    ----------
+    wv : numpy.ndarray
+        The wavelengths of the spectra.
+    X : numpy.ndarray
+        The spectra to plot.
+    selFeatures : list of int or list of list of int
+        The selected features to highlight in the plot.
+    methodNames : str or list of str, optional
+        The names of the feature selection methods used.
+    ylabel : str, optional
+        The label for the y-axis.
+    xlabel : str, optional
+        The label for the x-axis.
+    title : str, optional
+        The title of the plot.
+    ax : matplotlib.axes.Axes, optional
+        The axes to plot on. If None, a new figure and axes are created.
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The plotted axes.
+    """
     scale = 0.4
     ofset = 1
     if ax is None:
@@ -208,3 +367,4 @@ def plotFeatureSelection(wv, X, selFeatures, methodNames = None,
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
+    return ax

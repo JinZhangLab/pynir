@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pynir package &#8212; pynir  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="src" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="pynir-package">
+<h1>pynir package<a class="headerlink" href="#pynir-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-pynir.Calibration">
+<span id="pynir-calibration-module"></span><h2>pynir.Calibration module<a class="headerlink" href="#module-pynir.Calibration" title="Permalink to this heading">¶</a></h2>
+<p>Created on Wed Sep 28 11:00:35 2022</p>
+<p>&#64;author: chinn</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.Calibration.binaryClassificationReport">
+<span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">binaryClassificationReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ytrue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ypred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#binaryClassificationReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.binaryClassificationReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a binary classification report.</p>
+<p>This function generates a binary classification report for a binary classification problem
+by computing the confusion matrix and various performance metrics.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>ytrue<span class="classifier">numpy.ndarray</span></dt><dd><p>The true target variable vector.</p>
+</dd>
+<dt>ypred<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>report<span class="classifier">dict</span></dt><dd><p>A dictionary containing various performance metrics.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.Calibration.lsvc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">lsvc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'l2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'squared_hinge'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ovr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#lsvc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.lsvc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVC</span></code></p>
+<p>Linear Support Vector Classification (Linear SVC) model.</p>
+<p>This class extends the scikit-learn LinearSVC class to include
+methods for finding the optimal hyperparameters and computing
+the confusion matrix.</p>
+<section id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>get_optParams(X, y, Params=None, nfold=10, n_jobs=None)</dt><dd><p>Find the optimal hyperparameters for the model using cross-validation.</p>
+</dd>
+<dt>get_confusion_matrix(X, y)</dt><dd><p>Compute the confusion matrix for the model.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.lsvc.get_confusion_matrix">
+<span class="sig-name descname"><span class="pre">get_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#lsvc.get_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.lsvc.get_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the confusion matrix for the model.</p>
+<section id="id1">
+<h4>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h4>Returns<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>cm<span class="classifier">numpy.ndarray</span></dt><dd><p>The confusion matrix.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.lsvc.get_optParams">
+<span class="sig-name descname"><span class="pre">get_optParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#lsvc.get_optParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.lsvc.get_optParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the optimal hyperparameters for the model using cross-validation.</p>
+<section id="id3">
+<h4>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+<dt>Params<span class="classifier">dict, optional (default = None)</span></dt><dd><p>The hyperparameters to search over. If None, a default set of hyperparameters is used.</p>
+</dd>
+<dt>nfold<span class="classifier">int, optional (default = 10)</span></dt><dd><p>The number of folds to use in cross-validation.</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional (default = None)</span></dt><dd><p>The number of parallel jobs to run. If None, all CPUs are used.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h4>Returns<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>best_params<span class="classifier">dict</span></dt><dd><p>The optimal hyperparameters for the model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.Calibration.multiClass_to_binaryMatrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">multiClass_to_binaryMatrix</span></span><a class="reference internal" href="_modules/pynir/Calibration.html#multiClass_to_binaryMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.multiClass_to_binaryMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Multi-class to binary matrix conversion.</p>
+<p>This class is used to convert a multi-class target variable into a binary matrix
+suitable for training a multi-label classifier.</p>
+<section id="id5">
+<h3>Methods<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>fit(x)</dt><dd><p>Fit the transformer to the data.</p>
+</dd>
+<dt>transform(x)</dt><dd><p>Transform the data into a binary matrix.</p>
+</dd>
+<dt>reTransform(xnew)</dt><dd><p>Convert the binary matrix back into the original target variable.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.multiClass_to_binaryMatrix.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#multiClass_to_binaryMatrix.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.multiClass_to_binaryMatrix.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the transformer to the data.</p>
+<section id="id6">
+<h4>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>x<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h4>Returns<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.multiClass_to_binaryMatrix.reTransform">
+<span class="sig-name descname"><span class="pre">reTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xnew</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#multiClass_to_binaryMatrix.reTransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.multiClass_to_binaryMatrix.reTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the binary matrix back into the original target variable.</p>
+<section id="id8">
+<h4>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>xnew<span class="classifier">numpy.ndarray</span></dt><dd><p>The binary matrix.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h4>Returns<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>x<span class="classifier">numpy.ndarray</span></dt><dd><p>The original target variable vector.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.multiClass_to_binaryMatrix.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#multiClass_to_binaryMatrix.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.multiClass_to_binaryMatrix.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the data into a binary matrix.</p>
+<section id="id10">
+<h4>Parameters<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>x<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h4>Returns<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>Xnew<span class="classifier">numpy.ndarray</span></dt><dd><p>The binary matrix.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.Calibration.multiClassificationReport">
+<span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">multiClassificationReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ytrue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ypred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#multiClassificationReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.multiClassificationReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a classification report for a multi-class classification problem.</p>
+<p>This function generates a classification report for a multi-class classification problem
+by computing binary classification reports for each class.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>ytrue<span class="classifier">numpy.ndarray</span></dt><dd><p>The true target variable vector.</p>
+</dd>
+<dt>ypred<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>report<span class="classifier">dict</span></dt><dd><p>A dictionary containing binary classification reports for each class.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.Calibration.plot_confusion_matrix">
+<span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plot_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plot_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a sklearn confusion matrix (cm), make a nice plot</p>
+<section id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Permalink to this heading">¶</a></h3>
+<p>cm:           confusion matrix from sklearn.metrics.confusion_matrix</p>
+<dl class="simple">
+<dt>target_names: given classification classes such as [0, 1, 2]</dt><dd><p>the class names, for example: [‘high’, ‘medium’, ‘low’]</p>
+</dd>
+</dl>
+<p>title:        the text to display at the top of the matrix</p>
+<dl class="simple">
+<dt>cmap:         the gradient of the values displayed from matplotlib.pyplot.cm</dt><dd><p>see <a class="reference external" href="http://matplotlib.org/examples/color/colormaps_reference.html">http://matplotlib.org/examples/color/colormaps_reference.html</a>
+plt.get_cmap(‘jet’) or plt.cm.Blues</p>
+</dd>
+<dt>normalize:    If False, plot the raw numbers</dt><dd><p>If True, plot the proportions</p>
+</dd>
+</dl>
+</section>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h3>
+<dl>
+<dt>plot_confusion_matrix(cm           = cm,                  # confusion matrix created by</dt><dd><blockquote>
+<div><p># sklearn.metrics.confusion_matrix</p>
+</div></blockquote>
+<p>normalize    = True,                # show proportions
+target_names = y_labels_vals,       # list of names of the classes
+title        = best_estimator_name) # title of graph</p>
+</dd>
+</dl>
+</section>
+<section id="citiation">
+<h3>Citiation<a class="headerlink" href="#citiation" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference external" href="http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html">http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html</a></p>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.Calibration.pls">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">pls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Partial Least Squares (PLS) regression model.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>n_components<span class="classifier">int, optional (default=2)</span></dt><dd><p>The number of PLS components to use.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>model<span class="classifier">dict</span></dt><dd><p>The PLS model, containing the following keys:
+- ‘x_scores’: the X scores
+- ‘x_loadings’: the X loadings
+- ‘y_loadings’: the Y loadings
+- ‘x_weights’: the X weights
+- ‘B’: the regression coefficients</p>
+</dd>
+<dt>optLV<span class="classifier">int</span></dt><dd><p>The optimal number of PLS components, determined by cross-validation.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Methods<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>fit(X, y)</dt><dd><p>Fit the PLS model to the training data.</p>
+</dd>
+<dt>predict(Xnew, n_components=None)</dt><dd><p>Predict the response variable for new data.</p>
+</dd>
+<dt>crossValidation_predict(nfold=10)</dt><dd><p>Perform cross-validation and return the predicted response variable.</p>
+</dd>
+<dt>get_optLV(nfold=10)</dt><dd><p>Determine the optimal number of PLS components using cross-validation.</p>
+</dd>
+<dt>transform(Xnew)</dt><dd><p>Transform new data into the PLS space.</p>
+</dd>
+<dt>get_vip()</dt><dd><p>Compute the variable importance in projection (VIP) scores.</p>
+</dd>
+<dt>plot_prediction(y, yhat, xlabel=”Reference”, ylabel=”Prediction”, title=””, ax=None)</dt><dd><p>Plot the predicted response variable against the reference variable.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.pls.crossValidation_predict">
+<span class="sig-name descname"><span class="pre">crossValidation_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls.crossValidation_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls.crossValidation_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform cross-validation and return the predicted response variable.</p>
+<section id="id16">
+<h4>Parameters<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>nfold<span class="classifier">int, optional (default=10)</span></dt><dd><p>The number of folds to use in cross-validation.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h4>Returns<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>yhat<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted response variable.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.pls.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the PLS model to the training data.</p>
+<section id="id18">
+<h4>Parameters<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The independent variable matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The dependent variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h4>Returns<a class="headerlink" href="#id19" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">pls</span></dt><dd><p>The fitted PLS model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.pls.get_optLV">
+<span class="sig-name descname"><span class="pre">get_optLV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls.get_optLV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls.get_optLV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the optimal number of PLS components using cross-validation.</p>
+<section id="id20">
+<h4>Parameters<a class="headerlink" href="#id20" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>nfold<span class="classifier">int, optional (default=10)</span></dt><dd><p>The number of folds to use in cross-validation.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h4>Returns<a class="headerlink" href="#id21" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>optLV<span class="classifier">int</span></dt><dd><p>The optimal number of PLS components.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.pls.get_vip">
+<span class="sig-name descname"><span class="pre">get_vip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls.get_vip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls.get_vip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the variable importance in projection (VIP) scores.</p>
+<section id="id22">
+<h4>Returns<a class="headerlink" href="#id22" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>vipScore<span class="classifier">numpy.ndarray</span></dt><dd><p>The VIP scores.</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h4>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h4>
+<p><a class="reference external" href="https://www.sciencedirect.com/topics/engineering/variable-importance-in-projection">https://www.sciencedirect.com/topics/engineering/variable-importance-in-projection</a></p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.pls.plot_prediction">
+<span class="sig-name descname"><span class="pre">plot_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yhat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Reference'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Prediction'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls.plot_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls.plot_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the predicted response variable against the reference variable.</p>
+<section id="id23">
+<h4>Parameters<a class="headerlink" href="#id23" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The reference variable.</p>
+</dd>
+<dt>yhat<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted response variable.</p>
+</dd>
+<dt>xlabel<span class="classifier">str, optional (default=”Reference”)</span></dt><dd><p>The label for the x-axis.</p>
+</dd>
+<dt>ylabel<span class="classifier">str, optional (default=”Prediction”)</span></dt><dd><p>The label for the y-axis.</p>
+</dd>
+<dt>title<span class="classifier">str, optional (default=””)</span></dt><dd><p>The title for the plot.</p>
+</dd>
+<dt>ax<span class="classifier">matplotlib.axes.Axes, optional</span></dt><dd><p>The axes on which to plot the figure (default is None).</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h4>Returns<a class="headerlink" href="#id24" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>ax<span class="classifier">matplotlib.axes.Axes</span></dt><dd><p>The axes object containing the plotted figure.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.pls.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict the response variable for new data.</p>
+<section id="id25">
+<h4>Parameters<a class="headerlink" href="#id25" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>Xnew<span class="classifier">numpy.ndarray</span></dt><dd><p>The new independent variable matrix.</p>
+</dd>
+<dt>n_components<span class="classifier">int, optional</span></dt><dd><p>The number of PLS components to use (default is None, which uses all components).</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h4>Returns<a class="headerlink" href="#id26" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>ynew_hat<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted response variable.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.pls.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#pls.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.pls.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform new data into the PLS space.</p>
+<section id="id27">
+<h4>Parameters<a class="headerlink" href="#id27" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>Xnew<span class="classifier">numpy.ndarray</span></dt><dd><p>The new independent variable matrix.</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h4>Returns<a class="headerlink" href="#id28" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>Tnew<span class="classifier">numpy.ndarray</span></dt><dd><p>The transformed data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">plsda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PLSRegression</span></code></p>
+<p>Partial Least Squares Discriminant Analysis (PLS-DA) model.</p>
+<p>This class extends the scikit-learn PLSRegression class to include
+Linear Discriminant Analysis (LDA) for classification.</p>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>n_components<span class="classifier">int, optional (default = 2)</span></dt><dd><p>Number of components to keep in the model.</p>
+</dd>
+<dt>scale<span class="classifier">bool, optional (default = True)</span></dt><dd><p>Whether to scale the data before fitting the model.</p>
+</dd>
+<dt><a href="#id30"><span class="problematic" id="id31">**</span></a>kwargs<span class="classifier">dict, optional</span></dt><dd><p>Additional keyword arguments to pass to the PLSRegression constructor.</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h3>Attributes<a class="headerlink" href="#id32" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>lda<span class="classifier">LinearDiscriminantAnalysis</span></dt><dd><p>The LDA model used for classification.</p>
+</dd>
+</dl>
+</section>
+<section id="id33">
+<h3>Methods<a class="headerlink" href="#id33" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>fit(X, y)</dt><dd><p>Fit the PLS-DA model to the training data.</p>
+</dd>
+<dt>predict(X)</dt><dd><p>Predict the class labels for new data.</p>
+</dd>
+<dt>predict_log_proba(X)</dt><dd><p>Predict the log probabilities of the class labels for new data.</p>
+</dd>
+<dt>predict_proba(X)</dt><dd><p>Predict the probabilities of the class labels for new data.</p>
+</dd>
+<dt>crossValidation_predict(nfold=10)</dt><dd><p>Perform cross-validation to predict the class labels for the training data.</p>
+</dd>
+<dt>get_optLV(nfold=10)</dt><dd><p>Find the optimal number of components using cross-validation.</p>
+</dd>
+<dt>get_confusion_matrix(X, y)</dt><dd><p>Compute the confusion matrix for the model.</p>
+</dd>
+<dt>get_vip()</dt><dd><p>Compute the Variable Importance in Projection (VIP) scores for the model.</p>
+</dd>
+<dt>permutation_test(X, y, n_repeats=100, n_jobs=None)</dt><dd><p>Perform a permutation test to assess the significance of the model.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.crossValidation_predict">
+<span class="sig-name descname"><span class="pre">crossValidation_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.crossValidation_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.crossValidation_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform cross-validation to predict the class labels for the training data.</p>
+<section id="id34">
+<h4>Parameters<a class="headerlink" href="#id34" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>nfold<span class="classifier">int, optional (default = 10)</span></dt><dd><p>The number of folds to use in cross-validation.</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h4>Returns<a class="headerlink" href="#id35" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>yhat<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted class labels for each fold and each number of components.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the PLS-DA model to the training data.</p>
+<section id="id36">
+<h4>Parameters<a class="headerlink" href="#id36" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The training data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h4>Returns<a class="headerlink" href="#id37" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">plsda</span></dt><dd><p>The fitted PLS-DA model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.get_confusion_matrix">
+<span class="sig-name descname"><span class="pre">get_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.get_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.get_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the confusion matrix for the model.</p>
+<section id="id38">
+<h4>Parameters<a class="headerlink" href="#id38" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h4>Returns<a class="headerlink" href="#id39" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>cm<span class="classifier">numpy.ndarray</span></dt><dd><p>The confusion matrix.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.get_optLV">
+<span class="sig-name descname"><span class="pre">get_optLV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.get_optLV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.get_optLV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the optimal number of components using cross-validation.</p>
+<section id="id40">
+<h4>Parameters<a class="headerlink" href="#id40" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>nfold<span class="classifier">int, optional (default = 10)</span></dt><dd><p>The number of folds to use in cross-validation.</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h4>Returns<a class="headerlink" href="#id41" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>optLV<span class="classifier">int</span></dt><dd><p>The optimal number of components.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.get_vip">
+<span class="sig-name descname"><span class="pre">get_vip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.get_vip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.get_vip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Variable Importance in Projection (VIP) scores for the model.</p>
+<section id="id42">
+<h4>Returns<a class="headerlink" href="#id42" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>vipScore<span class="classifier">numpy.ndarray</span></dt><dd><p>The VIP scores.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.permutation_test">
+<span class="sig-name descname"><span class="pre">permutation_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.permutation_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.permutation_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a permutation test to assess the significance of the model.</p>
+<section id="id43">
+<h4>Parameters<a class="headerlink" href="#id43" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+<dt>n_repeats<span class="classifier">int, optional (default = 100)</span></dt><dd><p>The number of permutations to perform.</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional (default = None)</span></dt><dd><p>The number of parallel jobs to run. If None, all CPUs are used.</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h4>Returns<a class="headerlink" href="#id44" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>q2<span class="classifier">numpy.ndarray</span></dt><dd><p>The Q2 values for each permutation.</p>
+</dd>
+<dt>r2<span class="classifier">numpy.ndarray</span></dt><dd><p>The R2 values for each permutation.</p>
+</dd>
+<dt>permutation_ratio<span class="classifier">numpy.ndarray</span></dt><dd><p>The ratio of permuted target variable values to total target variable values for each permutation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict the class labels for new data.</p>
+<section id="id45">
+<h4>Parameters<a class="headerlink" href="#id45" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The new data matrix.</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h4>Returns<a class="headerlink" href="#id46" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y_pred<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted class labels.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.predict_log_proba">
+<span class="sig-name descname"><span class="pre">predict_log_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.predict_log_proba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.predict_log_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict the log probabilities of the class labels for new data.</p>
+<section id="id47">
+<h4>Parameters<a class="headerlink" href="#id47" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The new data matrix.</p>
+</dd>
+</dl>
+</section>
+<section id="id48">
+<h4>Returns<a class="headerlink" href="#id48" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>log_proba<span class="classifier">numpy.ndarray</span></dt><dd><p>The log probabilities of the class labels.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.plsda.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#plsda.predict_proba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.plsda.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict the probabilities of the class labels for new data.</p>
+<section id="id49">
+<h4>Parameters<a class="headerlink" href="#id49" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The new data matrix.</p>
+</dd>
+</dl>
+</section>
+<section id="id50">
+<h4>Returns<a class="headerlink" href="#id50" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>proba<span class="classifier">numpy.ndarray</span></dt><dd><p>The probabilities of the class labels.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.Calibration.regressionReport">
+<span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">regressionReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ytrue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ypred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#regressionReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.regressionReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a regression report.</p>
+<p>This function generates a regression report for a regression problem
+by computing the root mean squared error (RMSE) and the R-squared (R2) score.</p>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>ytrue<span class="classifier">numpy.ndarray</span></dt><dd><p>The true target variable vector.</p>
+</dd>
+<dt>ypred<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h3>Returns<a class="headerlink" href="#id52" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>report<span class="classifier">dict</span></dt><dd><p>A dictionary containing the RMSE and R2 score.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.Calibration.rf">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">rf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gini'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_weight_fraction_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sqrt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_leaf_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_impurity_decrease</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oob_score</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccp_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#rf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.rf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RandomForestClassifier</span></code></p>
+<p>Random Forest Classification (RF) model.</p>
+<p>This class extends the scikit-learn RandomForestClassifier class to include
+methods for finding the optimal hyperparameters and computing the confusion matrix.</p>
+<section id="id53">
+<h3>Methods<a class="headerlink" href="#id53" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>get_optParams(X, y, Params=None, nfold=10, n_jobs=None)</dt><dd><p>Find the optimal hyperparameters for the model using cross-validation.</p>
+</dd>
+<dt>get_confusion_matrix(X, y)</dt><dd><p>Compute the confusion matrix for the model.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.rf.get_confusion_matrix">
+<span class="sig-name descname"><span class="pre">get_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#rf.get_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.rf.get_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the confusion matrix for the model.</p>
+<section id="id54">
+<h4>Parameters<a class="headerlink" href="#id54" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id55">
+<h4>Returns<a class="headerlink" href="#id55" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>cm<span class="classifier">numpy.ndarray</span></dt><dd><p>The confusion matrix.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.rf.get_optParams">
+<span class="sig-name descname"><span class="pre">get_optParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#rf.get_optParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.rf.get_optParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the optimal hyperparameters for the model using cross-validation.</p>
+<section id="id56">
+<h4>Parameters<a class="headerlink" href="#id56" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+<dt>Params<span class="classifier">dict, optional (default = None)</span></dt><dd><p>The hyperparameters to search over. If None, a default set of hyperparameters is used.</p>
+</dd>
+<dt>nfold<span class="classifier">int, optional (default = 10)</span></dt><dd><p>The number of folds to use in cross-validation.</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional (default = None)</span></dt><dd><p>The number of parallel jobs to run. If None, all CPUs are used.</p>
+</dd>
+</dl>
+</section>
+<section id="id57">
+<h4>Returns<a class="headerlink" href="#id57" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>best_params<span class="classifier">dict</span></dt><dd><p>The optimal hyperparameters for the model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.Calibration.sampleSplit_KS">
+<span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">sampleSplit_KS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euclidean'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#sampleSplit_KS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.sampleSplit_KS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split a dataset into training and testing sets using the KS algorithm.</p>
+<p>This function splits a dataset into training and testing sets using the KS algorithm,
+which selects points that maximize the minimum distance between them and previously
+selected points.</p>
+<section id="id58">
+<h3>Parameters<a class="headerlink" href="#id58" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The dataset to split.</p>
+</dd>
+<dt>test_size<span class="classifier">float, optional</span></dt><dd><p>The proportion of the dataset to include in the test split.</p>
+</dd>
+<dt>metric<span class="classifier">str, optional</span></dt><dd><p>The distance metric to use for computing distances between points.</p>
+</dd>
+<dt><a href="#id59"><span class="problematic" id="id60">*</span></a>args<span class="classifier">tuple</span></dt><dd><p>Additional arguments to pass to the distance metric function.</p>
+</dd>
+<dt><a href="#id61"><span class="problematic" id="id62">**</span></a>kwargs<span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to the distance metric function.</p>
+</dd>
+</dl>
+</section>
+<section id="id63">
+<h3>Returns<a class="headerlink" href="#id63" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>trainIdx<span class="classifier">numpy.ndarray</span></dt><dd><p>The indices of the training set.</p>
+</dd>
+<dt>testIdx<span class="classifier">numpy.ndarray</span></dt><dd><p>The indices of the testing set.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+K. S. Lee, “Automatic thresholding for defect detection,” Pattern Recognition, vol. 21, no. 3, pp. 225-238, 1988.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.Calibration.sampleSplit_random">
+<span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">sampleSplit_random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#sampleSplit_random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.sampleSplit_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly split a dataset into training and testing sets.</p>
+<p>This function randomly splits a dataset into training and testing sets
+using the train_test_split function from scikit-learn.</p>
+<section id="id64">
+<h3>Parameters<a class="headerlink" href="#id64" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The dataset to split.</p>
+</dd>
+<dt>test_size<span class="classifier">float, optional</span></dt><dd><p>The proportion of the dataset to include in the test split.</p>
+</dd>
+<dt>random_state<span class="classifier">int, optional</span></dt><dd><p>The random seed to use for reproducibility.</p>
+</dd>
+<dt>shuffle<span class="classifier">bool, optional</span></dt><dd><p>Whether or not to shuffle the dataset before splitting.</p>
+</dd>
+</dl>
+</section>
+<section id="id65">
+<h3>Returns<a class="headerlink" href="#id65" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>trainIdx<span class="classifier">numpy.ndarray</span></dt><dd><p>The indices of the training set.</p>
+</dd>
+<dt>testIdx<span class="classifier">numpy.ndarray</span></dt><dd><p>The indices of the testing set.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.Calibration.simpls">
+<span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">simpls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#simpls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.simpls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform SIMPLS (Partial Least Squares) regression.</p>
+<p>This function performs SIMPLS regression, which is a variant of PLS regression
+that uses a sequential algorithm to compute the PLS components.</p>
+<section id="id66">
+<h3>Parameters<a class="headerlink" href="#id66" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The independent variable matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The dependent variable vector.</p>
+</dd>
+<dt>n_components<span class="classifier">int</span></dt><dd><p>The number of PLS components to compute.</p>
+</dd>
+</dl>
+</section>
+<section id="id67">
+<h3>Returns<a class="headerlink" href="#id67" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>results<span class="classifier">dict</span></dt><dd><p>A dictionary containing the PLS components and loadings.</p>
+</dd>
+</dl>
+</section>
+<section id="id68">
+<h3>Notes<a class="headerlink" href="#id68" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+Wold, S., Ruhe, A., Wold, H., &amp; Dunn III, W. J. (1984).
+The collinearity problem in linear regression. The partial least squares (PLS) approach to generalized inverses.
+SIAM Journal on Scientific and Statistical Computing, 5(3), 735-743.</p>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.Calibration.svc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.Calibration.</span></span><span class="sig-name descname"><span class="pre">svc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rbf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scale'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coef0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shrinking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decision_function_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ovr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_ties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#svc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.svc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SVC</span></code></p>
+<p>Support Vector Classification (SVC) model.</p>
+<p>This class extends the scikit-learn SVC class to include methods for
+finding the optimal hyperparameters and computing the confusion matrix.</p>
+<section id="id69">
+<h3>Methods<a class="headerlink" href="#id69" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>get_optParams(X, y, Params=None, nfold=10, n_jobs=None)</dt><dd><p>Find the optimal hyperparameters for the model using cross-validation.</p>
+</dd>
+<dt>get_confusion_matrix(X, y)</dt><dd><p>Compute the confusion matrix for the model.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.svc.get_confusion_matrix">
+<span class="sig-name descname"><span class="pre">get_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#svc.get_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.svc.get_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the confusion matrix for the model.</p>
+<section id="id70">
+<h4>Parameters<a class="headerlink" href="#id70" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+</dl>
+</section>
+<section id="id71">
+<h4>Returns<a class="headerlink" href="#id71" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>cm<span class="classifier">numpy.ndarray</span></dt><dd><p>The confusion matrix.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.Calibration.svc.get_optParams">
+<span class="sig-name descname"><span class="pre">get_optParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/Calibration.html#svc.get_optParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.Calibration.svc.get_optParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the optimal hyperparameters for the model using cross-validation.</p>
+<section id="id72">
+<h4>Parameters<a class="headerlink" href="#id72" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The data matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The target variable vector.</p>
+</dd>
+<dt>Params<span class="classifier">dict, optional (default = None)</span></dt><dd><p>The hyperparameters to search over. If None, a default set of hyperparameters is used.</p>
+</dd>
+<dt>nfold<span class="classifier">int, optional (default = 10)</span></dt><dd><p>The number of folds to use in cross-validation.</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional (default = None)</span></dt><dd><p>The number of parallel jobs to run. If None, all CPUs are used.</p>
+</dd>
+</dl>
+</section>
+<section id="id73">
+<h4>Returns<a class="headerlink" href="#id73" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>best_params<span class="classifier">dict</span></dt><dd><p>The optimal hyperparameters for the model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-pynir.CalibrationTransfer">
+<span id="pynir-calibrationtransfer-module"></span><h2>pynir.CalibrationTransfer module<a class="headerlink" href="#module-pynir.CalibrationTransfer" title="Permalink to this heading">¶</a></h2>
+<p>Created on Wed Sep 28 11:00:35 2022</p>
+<p>&#64;author: chinn</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.BS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">BS</span></span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#BS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.BS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Implementation of the Osborne and Fearn Back-Shift (BS) method for spectral calibration.</p>
+<p>This class implements the BS algorithm for spectral calibration, which is a method
+for transferring calibration models between instruments with different spectral
+characteristics.</p>
+<section id="id74">
+<h3>Notes<a class="headerlink" href="#id74" title="Permalink to this heading">¶</a></h3>
+<p>Osborne, B. G., &amp; Fearn, T. (1983).
+Collaborative evaluation of universal calibrations for the measurement of protein and moisture
+in flour by near infrared reflectance. International Journal of Food Science &amp; Technology, 18(4), 453-460.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.BS.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#BS.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.BS.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the BS model to the training data.</p>
+<section id="id75">
+<h4>Parameters<a class="headerlink" href="#id75" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y1<span class="classifier">numpy.ndarray</span></dt><dd><p>The predictions of standard spectra from the master instrument.</p>
+</dd>
+<dt>y2<span class="classifier">numpy.ndarray</span></dt><dd><p>The predictions of standard spectra from the slave instrument.</p>
+</dd>
+</dl>
+</section>
+<section id="id76">
+<h4>Returns<a class="headerlink" href="#id76" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">BS</span></dt><dd><p>The fitted BS model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.BS.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#BS.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.BS.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the BS model to new prediction of spectra from slave instrument.</p>
+<section id="id77">
+<h4>Parameters<a class="headerlink" href="#id77" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y2<span class="classifier">numpy.ndarray</span></dt><dd><p>The predictions of spectra measured on the slave instrument.</p>
+</dd>
+</dl>
+</section>
+<section id="id78">
+<h4>Returns<a class="headerlink" href="#id78" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y1<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted reference values with correction</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.FS_PFCE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">FS_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#FS_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.FS_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Full-Supervised Parameter-Free Calibration Enhancement (FS-PFCE) framework for spectral calibration enhancement.</p>
+<p>This class implements the FS-PFCE algorithm for spectral calibration enhancement, which is a method
+for transferring calibration models between instruments with different spectral
+characteristics.</p>
+<section id="id79">
+<h3>Parameters<a class="headerlink" href="#id79" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>thres<span class="classifier">float, optional</span></dt><dd><p>The threshold for tconstraint.</p>
+</dd>
+<dt>constrType<span class="classifier">int, optional</span></dt><dd><p>The type of constraint to use for optimization.</p>
+</dd>
+</dl>
+</section>
+<section id="id80">
+<h3>Attributes<a class="headerlink" href="#id80" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>b2<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the training data.</p>
+</dd>
+</dl>
+</section>
+<section id="id81">
+<h3>Notes<a class="headerlink" href="#id81" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+[1] Zhang J., Zhou X, Li B. Y.*, PFCE2: A versatile parameter-free calibration enhancement framework for near-infrared spectroscopy, Spectrochimica Acta Part A: Molecular and Biomolecular Spectroscopy, 2023, 301: 122978.
+[2] Zhang J., Li B. Y.*, Hu Y., Zhou L. X., Wang G. Z., Guo G., Zhang Q. H., Lei S. C.*, Zhang A. H., A Parameter-Free Framework for Calibration Enhancement of Near-Infrared Spectroscopy Based on Correlation Constraint, Anal. Chim. Acta, 2021, 1142: 169-178.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.FS_PFCE.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#FS_PFCE.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.FS_PFCE.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the FS-PFCE model to the training data.</p>
+<section id="id82">
+<h4>Parameters<a class="headerlink" href="#id82" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X1<span class="classifier">numpy.ndarray</span></dt><dd><p>The standard spectra of the master instrument.</p>
+</dd>
+<dt>X2<span class="classifier">numpy.ndarray</span></dt><dd><p>The standard spectra of the slave instrument.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The reference values of the slave instrument.</p>
+</dd>
+<dt>b1<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the master instrument.</p>
+</dd>
+</dl>
+</section>
+<section id="id83">
+<h4>Returns<a class="headerlink" href="#id83" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">FS_PFCE</span></dt><dd><p>The fitted FS-PFCE model for slave instrument.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.FS_PFCE.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#FS_PFCE.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.FS_PFCE.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the FS-PFCE model to spectra measured on slave instruments.</p>
+<section id="id84">
+<h4>Parameters<a class="headerlink" href="#id84" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The spectra to calibrate.</p>
+</dd>
+</dl>
+</section>
+<section id="id85">
+<h4>Returns<a class="headerlink" href="#id85" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The prediction of spectra from slave instrument with the FS-PFCE enhanced model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.MT_PFCE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">MT_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#MT_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.MT_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Multi-Task Parameter-Free Calibration Enhancement (MT-PFCE) framework for spectral calibration enhancement.</p>
+<p>This class implements the MT-PFCE algorithm for spectral calibration enhancement, which is a method
+for transferring calibration models between instruments with different spectral
+characteristics.</p>
+<section id="id86">
+<h3>Parameters<a class="headerlink" href="#id86" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>thres<span class="classifier">float, optional</span></dt><dd><p>The threshold for tconstraint.</p>
+</dd>
+<dt>constrType<span class="classifier">int, optional</span></dt><dd><p>The type of constraint to use for optimization.</p>
+</dd>
+</dl>
+</section>
+<section id="id87">
+<h3>Attributes<a class="headerlink" href="#id87" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>B<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the training data.</p>
+</dd>
+<dt>ntask<span class="classifier">int</span></dt><dd><p>The number of tasks.</p>
+</dd>
+</dl>
+</section>
+<section id="id88">
+<h3>Notes<a class="headerlink" href="#id88" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+[1] Zhang J., Zhou X, Li B. Y.*, PFCE2: A versatile parameter-free calibration enhancement framework for near-infrared spectroscopy, Spectrochimica Acta Part A: Molecular and Biomolecular Spectroscopy, 2023, 301: 122978.
+[2] Zhang J., Li B. Y.*, Hu Y., Zhou L. X., Wang G. Z., Guo G., Zhang Q. H., Lei S. C.*, Zhang A. H., A Parameter-Free Framework for Calibration Enhancement of Near-Infrared Spectroscopy Based on Correlation Constraint, Anal. Chim. Acta, 2021, 1142: 169-178.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.MT_PFCE.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#MT_PFCE.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.MT_PFCE.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the MT-PFCE model to the training data.</p>
+<section id="id89">
+<h4>Parameters<a class="headerlink" href="#id89" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">list of numpy.ndarray</span></dt><dd><p>The standard spectra of the master instrument for each task.</p>
+</dd>
+<dt>y<span class="classifier">list of numpy.ndarray</span></dt><dd><p>The reference values of the slave instrument for each task.</p>
+</dd>
+<dt>b1<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the master instrument.</p>
+</dd>
+</dl>
+</section>
+<section id="id90">
+<h4>Returns<a class="headerlink" href="#id90" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">MT_PFCE</span></dt><dd><p>The fitted MT-PFCE model for slave instrument.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.MT_PFCE.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">itask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#MT_PFCE.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.MT_PFCE.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the MT-PFCE model to spectra measured on slave instruments.</p>
+<section id="id91">
+<h4>Parameters<a class="headerlink" href="#id91" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The spectra to calibrate.</p>
+</dd>
+<dt>itask<span class="classifier">int</span></dt><dd><p>The index of the task to apply the model to.</p>
+</dd>
+</dl>
+</section>
+<section id="id92">
+<h4>Returns<a class="headerlink" href="#id92" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The prediction of spectra from ith task with the MT-PFCE enhanced model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.NS_PFCE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">NS_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#NS_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.NS_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Non-Supervised Parameter-Free Framework for Calibration Enhancement (NS-PFCE) for spectral calibration enhancement.</p>
+<p>This class implements the NS-PFCE algorithm for spectral calibration enhancement, which is a method
+for transferring calibration models between instruments with different spectral
+characteristics.</p>
+<section id="id93">
+<h3>Parameters<a class="headerlink" href="#id93" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>thres<span class="classifier">float, optional</span></dt><dd><p>The threshold for tconstraint.</p>
+</dd>
+<dt>constrType<span class="classifier">int, optional</span></dt><dd><p>The type of constraint to use for optimization.</p>
+</dd>
+</dl>
+</section>
+<section id="id94">
+<h3>Attributes<a class="headerlink" href="#id94" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>b2<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the training data.</p>
+</dd>
+</dl>
+</section>
+<section id="id95">
+<h3>Notes<a class="headerlink" href="#id95" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+[1] Zhang J., Zhou X, Li B. Y.*, PFCE2: A versatile parameter-free calibration enhancement framework for near-infrared spectroscopy, Spectrochimica Acta Part A: Molecular and Biomolecular Spectroscopy, 2023, 301: 122978.
+[2] Zhang J., Li B. Y.*, Hu Y., Zhou L. X., Wang G. Z., Guo G., Zhang Q. H., Lei S. C.*, Zhang A. H., A Parameter-Free Framework for Calibration Enhancement of Near-Infrared Spectroscopy Based on Correlation Constraint, Anal. Chim. Acta, 2021, 1142: 169-178.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.NS_PFCE.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#NS_PFCE.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.NS_PFCE.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the NS-PFCE model to the training data.</p>
+<section id="id96">
+<h4>Parameters<a class="headerlink" href="#id96" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X1<span class="classifier">numpy.ndarray</span></dt><dd><p>The standard spectra of the master instrument.</p>
+</dd>
+<dt>X2<span class="classifier">numpy.ndarray</span></dt><dd><p>The standard spectra of the slave instrument.</p>
+</dd>
+<dt>b1<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the master instrument.</p>
+</dd>
+</dl>
+</section>
+<section id="id97">
+<h4>Returns<a class="headerlink" href="#id97" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">NS_PFCE</span></dt><dd><p>The fitted NS-PFCE model for slave instrument.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.NS_PFCE.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#NS_PFCE.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.NS_PFCE.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the NS-PFCE model to spectra measured on slave instruments.</p>
+<section id="id98">
+<h4>Parameters<a class="headerlink" href="#id98" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The spectra to calibrate.</p>
+</dd>
+</dl>
+</section>
+<section id="id99">
+<h4>Returns<a class="headerlink" href="#id99" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The prediction of spectra from slave instrument with the NS-PFCE enhanced model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.PDS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">PDS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">halfWindowSize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mlr'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#PDS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.PDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Partial Direct Standardization (PDS) for spectral calibration.</p>
+<p>This class implements the PDS algorithm for spectral calibration, which is a method
+for transferring calibration models between instruments with different spectral
+characteristics.</p>
+<section id="id100">
+<h3>Parameters<a class="headerlink" href="#id100" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>halfWindowSize<span class="classifier">int, optional</span></dt><dd><p>The half window size for selecting the spectral bands.</p>
+</dd>
+<dt>regType<span class="classifier">str, optional</span></dt><dd><p>The regression type to use for modeling the calibration transfer function.</p>
+</dd>
+<dt><a href="#id101"><span class="problematic" id="id102">**</span></a>kwargs<span class="classifier">dict, optional</span></dt><dd><p>Additional keyword arguments to pass to the regression model.</p>
+</dd>
+</dl>
+</section>
+<section id="id103">
+<h3>Attributes<a class="headerlink" href="#id103" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>Models<span class="classifier">list</span></dt><dd><p>A list of regression models for each spectral band.</p>
+</dd>
+</dl>
+</section>
+<section id="id104">
+<h3>Notes<a class="headerlink" href="#id104" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+Li, H., Xu, Q., Liang, Y., &amp; Ying, Y. (2010).
+Partial direct standardization for calibration transfer between near-infrared spectrometers.
+Analytica Chimica Acta, 665(1), 77-82.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.PDS.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#PDS.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.PDS.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the PDS model to the training data.</p>
+<section id="id105">
+<h4>Parameters<a class="headerlink" href="#id105" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X1<span class="classifier">numpy.ndarray</span></dt><dd><p>The standard spectra of the master instrument.</p>
+</dd>
+<dt>X2<span class="classifier">numpy.ndarray</span></dt><dd><p>The standard spectra of the slave instrument.</p>
+</dd>
+</dl>
+</section>
+<section id="id106">
+<h4>Returns<a class="headerlink" href="#id106" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">PDS</span></dt><dd><p>The fitted PDS model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.PDS.get_windowRange">
+<span class="sig-name descname"><span class="pre">get_windowRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nFeatrues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#PDS.get_windowRange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.PDS.get_windowRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.PDS.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#PDS.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.PDS.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the PDS model to new data.</p>
+<section id="id107">
+<h4>Parameters<a class="headerlink" href="#id107" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The spectra to calibrate.</p>
+</dd>
+</dl>
+</section>
+<section id="id108">
+<h4>Returns<a class="headerlink" href="#id108" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>Xnew<span class="classifier">numpy.ndarray</span></dt><dd><p>The calibrated spectra.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.SST">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">SST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#SST"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.SST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Spectral Space Transformation (SST) for spectral calibration.</p>
+<p>This class implements the SST algorithm for spectral calibration, which is a method
+for transferring calibration models between instruments with different spectral
+characteristics.</p>
+<section id="id109">
+<h3>Parameters<a class="headerlink" href="#id109" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>n_components<span class="classifier">int, optional</span></dt><dd><p>The number of components to use for the truncated SVD.</p>
+</dd>
+</dl>
+</section>
+<section id="id110">
+<h3>Attributes<a class="headerlink" href="#id110" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>F<span class="classifier">numpy.ndarray</span></dt><dd><p>The transformation matrix learned from the training data.</p>
+</dd>
+</dl>
+</section>
+<section id="id111">
+<h3>Notes<a class="headerlink" href="#id111" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+Du W, Chen Z P, Zhong L J, et al. Maintaining the predictive abilities of multivariate calibration models by spectral space transformation[J]. Analytica Chimica Acta, 2011, 690(1): 64-70.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.SST.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#SST.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.SST.fit" title="Permalink to this definition">¶</a></dt>
+<dd><section id="id112">
+<h4>Parameters<a class="headerlink" href="#id112" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X1<span class="classifier">2D array</span></dt><dd><p>Standard spectra of the first instrument.</p>
+</dd>
+<dt>X2<span class="classifier">2D array</span></dt><dd><p>Standard spectra of the second instrument.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.SST.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#SST.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.SST.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.SS_PFCE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">SS_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#SS_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.SS_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Semi-Supervised Parameter-Free Calibration Enhancement (SS-PFCE) framework for spectral calibration enhancement.</p>
+<p>This class implements the SS-PFCE algorithm for spectral calibration enhancement, which is a method
+for transferring calibration models between instruments with different spectral
+characteristics.</p>
+<section id="id113">
+<h3>Parameters<a class="headerlink" href="#id113" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>thres<span class="classifier">float, optional</span></dt><dd><p>The threshold for tconstraint.</p>
+</dd>
+<dt>constrType<span class="classifier">int, optional</span></dt><dd><p>The type of constraint to use for optimization.</p>
+</dd>
+</dl>
+</section>
+<section id="id114">
+<h3>Attributes<a class="headerlink" href="#id114" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>b2<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the training data.</p>
+</dd>
+</dl>
+</section>
+<section id="id115">
+<h3>Notes<a class="headerlink" href="#id115" title="Permalink to this heading">¶</a></h3>
+<p>This implementation is based on the algorithm described in:
+[1] Zhang J., Zhou X, Li B. Y.*, PFCE2: A versatile parameter-free calibration enhancement framework for near-infrared spectroscopy, Spectrochimica Acta Part A: Molecular and Biomolecular Spectroscopy, 2023, 301: 122978.
+[2] Zhang J., Li B. Y.*, Hu Y., Zhou L. X., Wang G. Z., Guo G., Zhang Q. H., Lei S. C.*, Zhang A. H., A Parameter-Free Framework for Calibration Enhancement of Near-Infrared Spectroscopy Based on Correlation Constraint, Anal. Chim. Acta, 2021, 1142: 169-178.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.SS_PFCE.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#SS_PFCE.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.SS_PFCE.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the SS-PFCE model to the training data.</p>
+<section id="id116">
+<h4>Parameters<a class="headerlink" href="#id116" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X2<span class="classifier">numpy.ndarray</span></dt><dd><p>The standard spectra of the slave instrument.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The reference values of the slave instrument.</p>
+</dd>
+<dt>b1<span class="classifier">numpy.ndarray</span></dt><dd><p>The coefficients learned from the master instrument.</p>
+</dd>
+</dl>
+</section>
+<section id="id117">
+<h4>Returns<a class="headerlink" href="#id117" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>self<span class="classifier">SS_PFCE</span></dt><dd><p>The fitted SS-PFCE model for slave instrument.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.SS_PFCE.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#SS_PFCE.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.SS_PFCE.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the SS-PFCE model to spectra measured on slave instruments.</p>
+<section id="id118">
+<h4>Parameters<a class="headerlink" href="#id118" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The spectra to calibrate.</p>
+</dd>
+</dl>
+</section>
+<section id="id119">
+<h4>Returns<a class="headerlink" href="#id119" title="Permalink to this heading">¶</a></h4>
+<dl class="simple">
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The prediction of spectra from slave instrument with the SS-PFCE enhanced model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.cost_FS_PFCE">
+<span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">cost_FS_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#cost_FS_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.cost_FS_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.cost_MT_PFCE">
+<span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">cost_MT_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#cost_MT_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.cost_MT_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.cost_NS_PFCE">
+<span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">cost_NS_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#cost_NS_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.cost_NS_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.cost_SS_PFCE">
+<span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">cost_SS_PFCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#cost_SS_PFCE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.cost_SS_PFCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.pfce_constr1">
+<span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">pfce_constr1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thres</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#pfce_constr1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.pfce_constr1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.pfce_constr2">
+<span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">pfce_constr2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thres</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#pfce_constr2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.pfce_constr2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.CalibrationTransfer.pfce_constr3">
+<span class="sig-prename descclassname"><span class="pre">pynir.CalibrationTransfer.</span></span><span class="sig-name descname"><span class="pre">pfce_constr3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thres</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/CalibrationTransfer.html#pfce_constr3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.CalibrationTransfer.pfce_constr3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="pynir-featureselection-module">
+<h2>pynir.FeatureSelection module<a class="headerlink" href="#pynir-featureselection-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="pynir-outlierdection-module">
+<h2>pynir.OutlierDection module<a class="headerlink" href="#pynir-outlierdection-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="pynir-preprocessing-module">
+<h2>pynir.Preprocessing module<a class="headerlink" href="#pynir-preprocessing-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-pynir.utils">
+<span id="pynir-utils-module"></span><h2>pynir.utils module<a class="headerlink" href="#module-pynir.utils" title="Permalink to this heading">¶</a></h2>
+<p>Created on Wed Sep 28 11:02:36 2022</p>
+<p>&#64;author: Jin Zhang (<a class="reference external" href="mailto:zhangjin&#37;&#52;&#48;mail&#46;nankai&#46;edu&#46;cn">zhangjin<span>&#64;</span>mail<span>&#46;</span>nankai<span>&#46;</span>edu<span>&#46;</span>cn</a>)</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.utils.simulateNIR">
+<span class="sig-prename descclassname"><span class="pre">pynir.utils.</span></span><span class="sig-name descname"><span class="pre">simulateNIR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nSample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/utils.html#simulateNIR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.utils.simulateNIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate NIR spectra.</p>
+<section id="id120">
+<h3>Parameters<a class="headerlink" href="#id120" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>nSample<span class="classifier">int, optional</span></dt><dd><p>The number of samples to simulate. The default is 100.</p>
+</dd>
+<dt>n_components<span class="classifier">int, optional</span></dt><dd><p>The number of components for spectral simulation. The default is 3.</p>
+</dd>
+<dt>refType<span class="classifier">int, optional</span></dt><dd><p>The type of reference value to generate:
+- None for no reference value output
+- 1 for continuous values as reference value output
+- 2 or larger integer for binary or class output.
+The default is 1.</p>
+</dd>
+<dt>noise<span class="classifier">float, optional</span></dt><dd><p>The amount of noise to add to the simulated spectra. The default is 0.0.</p>
+</dd>
+<dt>seeds<span class="classifier">int, optional</span></dt><dd><p>The random seed for generating spectra and reference values. The default is 1.</p>
+</dd>
+</dl>
+</section>
+<section id="id121">
+<h3>Returns<a class="headerlink" href="#id121" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">numpy.ndarray</span></dt><dd><p>The simulated NIR spectra matrix.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The concentration or class of all samples.</p>
+</dd>
+<dt>wv<span class="classifier">numpy.ndarray</span></dt><dd><p>The wavelengths of the spectra.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pynir.utils.simulateNIR_calibrationTransfer">
+<span class="sig-prename descclassname"><span class="pre">pynir.utils.</span></span><span class="sig-name descname"><span class="pre">simulateNIR_calibrationTransfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nSample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shifts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pynir/utils.html#simulateNIR_calibrationTransfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pynir.utils.simulateNIR_calibrationTransfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate NIR spectra for calibration transfer.</p>
+<section id="id122">
+<h3>Parameters<a class="headerlink" href="#id122" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>nSample<span class="classifier">int, optional</span></dt><dd><p>The number of samples to simulate. The default is 100.</p>
+</dd>
+<dt>n_components<span class="classifier">int, optional</span></dt><dd><p>The number of components for spectral simulation. The default is 3.</p>
+</dd>
+<dt>shifts: float, optional</dt><dd><p>The shift level of base peaks for simulating secondary NIR spectra data.</p>
+</dd>
+<dt>refType<span class="classifier">int, optional</span></dt><dd><p>The type of reference value to generate:
+- None for no reference value output
+- 1 for continuous values as reference value output
+- 2 or larger integer for binary or class output.
+The default is 1.</p>
+</dd>
+<dt>noise<span class="classifier">float, optional</span></dt><dd><p>The amount of noise to add to the simulated spectra. The default is 0.0.</p>
+</dd>
+<dt>seeds<span class="classifier">int, optional</span></dt><dd><p>The random seed for generating spectra and reference values. The default is 1.</p>
+</dd>
+</dl>
+</section>
+<section id="id123">
+<h3>Returns<a class="headerlink" href="#id123" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>X1<span class="classifier">numpy.ndarray</span></dt><dd><p>The simulated NIR spectra matrix for the first set of spectra.</p>
+</dd>
+<dt>X2<span class="classifier">numpy.ndarray</span></dt><dd><p>The simulated NIR spectra matrix for the second set of spectra.</p>
+</dd>
+<dt>y<span class="classifier">numpy.ndarray</span></dt><dd><p>The concentration or class of all samples.</p>
+</dd>
+<dt>wv<span class="classifier">numpy.ndarray</span></dt><dd><p>The wavelengths of the spectra.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-pynir">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pynir" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pynir</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pynir package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">src</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">src</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Jin Zhang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/pynir.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
