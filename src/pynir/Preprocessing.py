@@ -59,7 +59,9 @@ class snv():
         X_norm : numpy.ndarray
             The normalized input matrix.
         """
-        X_norm = (X-self.mean[None,:])/self.std[None,:]
+        mean_expanded = np.tile(self.mean, (X.shape[0], 1))
+        std_expanded = np.tile(self.std, (X.shape[0], 1))
+        X_norm = (X - mean_expanded) / std_expanded
         return X_norm
     
     def fit_transform(self, X):
@@ -193,7 +195,9 @@ class msc():
             The normalized input matrix.
         """
         for i in range(X.shape[0]):
-            X[i,:] = LinearRegression().fit(X[i,:][:,None], self.mean[:,None]).predict(X[i,:][:,None]).ravel()
+            X_row = X[i, :].reshape(-1, 1)
+            mean_reshaped = self.mean.reshape(-1, 1)
+            X[i, :] = LinearRegression().fit(X_row, mean_reshaped).predict(X_row).ravel()
         return X
         
     
