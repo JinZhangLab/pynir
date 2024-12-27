@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from pynir.utils import simulateNIR
 
-from pynir.OutlierDection import outlierDetection_PLS
+from pynir.OutlierDetection import outlierDetection_PLS
 
 # simulate NIR data
 X,y,wv = simulateNIR(nSample=200,n_components=10,noise=1e-5)

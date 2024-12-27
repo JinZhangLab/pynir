@@ -2,7 +2,7 @@
 """
 Created on Wed Sep 28 11:00:35 2022
 
-@author: chinn
+@author: J Zhang (jzhang@chemoinfolab.com)
 """
 import numpy as np
 from sklearn.linear_model import LinearRegression

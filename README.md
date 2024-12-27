@@ -1,6 +1,6 @@
-# Commom Calibration methods for multivariate calibration
+# NIR calibration toolbox in python
 
-This is a Python library for dealing with multivariate calibration, e.g., Near infrared spectra regression and classification tasks.
+This is a Python library for handling Near infrared (NIR) spectral calibration.
 
 ## Installation
 
@@ -10,12 +10,21 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install [pynir]
 pip install pynir
 ```
 
-In addition, we have also provide an online version at [link](https://nir.chemoinfolab.com)
+In addition, we also provide an online version at [this link](https://nir.chemoinfolab.com)
 
+## Supported Algorithms and Modules
+
+- **Readers**: Import .CSV and .SPA files through `InnoSpectraNIRReader` and `spaReader`.
+- **Regression**: PLS, etc.
+- **Classification**: PLSDA, etc.
+- **Feature Selection**: MCUVE, RT, etc.
+- **Outlier Detection**
+- **Calibration Transfer**: PDS, SST, BS, PFCE variants
+- **Data Preprocessing**: SNV, CWT, MSC, etc.
 
 ## Usage
 
-### Simulata NIR spectra (spc) and reference values (conc)
+### Simulate NIR spectra (spc) and reference values (conc)
 
 ```python
 from pynir.utils import simulateNIR
@@ -29,7 +38,7 @@ spc, conc = simulateNIR()
 from pynir.utils import simulateNIR
 from pynir.Calibration import pls
 
-# estabilish PLS model
+# establish PLS model
 n_components = 10
 plsModel = pls(n_components = n_components)
 plsModel.fit(X,y)
@@ -73,7 +82,7 @@ featureSelected_MC_UVE = mcModel.featureRank[:nSel]
 
 ```
 
-### Outlier dection
+### Outlier detection
 
 ```python
 import numpy as np
@@ -81,7 +90,7 @@ import matplotlib.pyplot as plt
 
 from pynir.utils import simulateNIR
 
-from pynir.OutlierDection import outlierDection_PLS
+from pynir.OutlierDetection import outlierDetection_PLS
 
 # simulate NIR data
 X,y,wv = simulateNIR(nSample=200,n_components=10,noise=1e-5)
@@ -235,7 +244,7 @@ print("cost {:.2f} seconds for MT-PFCE".format(time.time()-tic))
 
 ```
 
-## Demon
+## Demo
 
 First, execute
 
@@ -252,7 +261,7 @@ python Demo2_Regression.py
 python Demo3_Binary_Classification.py
 python Demo4_Multiclass_Classification.py
 python Demo5_dataPreprocessing.py
-python Demo6_outierDection.py
+python Demo6_outlierDetection.py
 python Demo7_FeatureSelection_oneStep
 python Demo8_FeatureSelection_multiSteps.py
 python Demo9_calibrationTransfer.py
